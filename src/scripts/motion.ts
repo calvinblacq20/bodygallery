@@ -16,8 +16,16 @@ if (!reduceMotion && !touchScreen) {
   });
 }
 
-// Reveal elements once as they enter the viewport.
-const revealables = document.querySelectorAll<HTMLElement>('[data-reveal]');
+// Staggered groups: number the children so each arrives a beat after the one before
+// (capped, so long lists don't keep the last items waiting).
+document.querySelectorAll<HTMLElement>('[data-stagger]').forEach((group) => {
+  Array.from(group.children).forEach((child, i) => {
+    (child as HTMLElement).style.setProperty('--stagger-index', String(Math.min(i, 8)));
+  });
+});
+
+// Reveal elements and groups once as they enter the viewport.
+const revealables = document.querySelectorAll<HTMLElement>('[data-reveal], [data-stagger]');
 if ('IntersectionObserver' in window) {
   const observer = new IntersectionObserver(
     (entries) => {
@@ -27,7 +35,9 @@ if ('IntersectionObserver' in window) {
         observer.unobserve(entry.target);
       }
     },
-    { rootMargin: '0px 0px -8% 0px', threshold: 0.08 },
+    // The huge top margin counts anything already scrolled past as seen, so a fast fling or
+    // an anchor jump (/#packages) never leaves content above the screen waiting to fade in.
+    { rootMargin: '100000px 0px -8% 0px', threshold: 0.08 },
   );
   revealables.forEach((el) => observer.observe(el));
 } else {

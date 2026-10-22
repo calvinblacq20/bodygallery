@@ -1,0 +1,45 @@
+---
+/**
+ * Two rows of treatment names that loop on their own: the top row runs left, the bottom right.
+ * Decorative: every name is a real link elsewhere on the page, so the band is hidden from
+ * assistive tech. Each row is two identical halves, so sliding it by half its width lands
+ * exactly where it started and the loop never shows a seam.
+ */
+const rows = [
+  ['Massage', 'Facials', 'Body scrub', 'Waxing', 'Hammam', 'Steam sauna'],
+  ['Stretch marks', 'Laser', 'Ombré brows', 'Lip blush', 'Teeth whitening', 'Pedicure'],
+];
+---
+
+<section class="overflow-hidden bg-snow pt-20 md:pt-28" aria-hidden="true">
+  {rows.map((words, r) => (
+    <div class="marquee-row">
+      <div
+        class:list={[
+          'marquee text-[clamp(2.4rem,7vw,7.5rem)] leading-[1.1] font-medium tracking-[-0.03em] whitespace-nowrap uppercase',
+          r === 1 && 'text-brand',
+        ]}
+        data-direction={r === 1 ? 'right' : 'left'}
+      >
+        {[0, 1].map(() => (
+          <p class="flex shrink-0 items-center">
+            {[...words, ...words].map((word, i) => (
+              <>
+                <span
+                  class:list={[
+                    'pr-[0.35em]',
+                    (i + r) % 2 === 1 &&
+                      'font-serif font-normal tracking-normal normal-case italic',
+                  ]}
+                >
+                  {word}
+                </span>
+                <span class="mr-[0.35em] size-[0.14em] shrink-0 rounded-full bg-current opacity-40"></span>
+              </>
+            ))}
+          </p>
+        ))}
+      </div>
+    </div>
+  ))}
+</section>

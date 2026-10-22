@@ -54,7 +54,7 @@ const year = new Date().getFullYear();
     </div>
 
     <nav aria-label="Footer" class="footer-nav grid grid-cols-2 content-start gap-x-8 text-sm">
-      <ul>
+      <ul data-stagger>
         {[
           ['/', 'Home'],
           ['/services', 'Services'],
@@ -71,7 +71,7 @@ const year = new Date().getFullYear();
           </li>
         ))}
       </ul>
-      <ul>
+      <ul data-stagger>
         {[
           [settings.socials.tiktok, 'TikTok'],
           [settings.socials.instagram, 'Instagram'],

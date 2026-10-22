@@ -392,6 +392,50 @@ html.lenis body {
   overflow: clip;
 }
 
+/* Treatment band: rows loop continuously (time-based, so phones and desktops alike).
+   Each row holds two identical halves; moving it by half its width is one seamless lap. */
+.marquee {
+  display: flex;
+  width: max-content;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .marquee {
+    animation: marquee 32s linear infinite;
+  }
+  .marquee[data-direction='right'] {
+    animation-direction: reverse;
+    animation-duration: 38s;
+  }
+  @media (min-width: 768px) {
+    .marquee {
+      animation-duration: 55s;
+    }
+    .marquee[data-direction='right'] {
+      animation-duration: 64s;
+    }
+  }
+  .marquee-row:hover .marquee {
+    animation-play-state: paused;
+  }
+  @keyframes marquee {
+    from {
+      transform: translate3d(0, 0, 0);
+    }
+    to {
+      transform: translate3d(-50%, 0, 0);
+    }
+  }
+}
+
+/* Masked title lines: each line is its own block so it can rise out of its mask. */
+.line,
+.line-in {
+  display: block;
+}
+.scroll-progress {
+  display: none;
+}
+
 @media (prefers-reduced-motion: no-preference) {
   /* Scroll reveal: hidden only once JS is confirmed, so no-JS visitors always see content. */
   .js [data-reveal] {
@@ -406,6 +450,66 @@ html.lenis body {
     transform: none;
   }
   .js [data-reveal].is-in {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Titles: each line slides up out of a mask. The mask reaches past the line box so
+     italic overhangs and descenders are never trimmed once the text has landed. */
+  .js [data-reveal='lines'] {
+    opacity: 1;
+    transform: none;
+  }
+  .js .line {
+    clip-path: inset(-0.5em -0.5em -0.3em -0.5em);
+  }
+  .js .line-in {
+    transition: transform 1.2s var(--ease-out-expo);
+    transition-delay: calc(var(--reveal-delay, 0s) + var(--line, 0) * 0.09s);
+  }
+  .js :is([data-reveal], [data-stagger]):not(.is-in) .line-in {
+    transform: translate3d(0, 160%, 0);
+  }
+
+  /* Photos: the picture wipes open upward and settles from a gentle zoom. The clip sits on
+     the picture, not the frame: Chrome counts a fully clipped element as off-screen, so a
+     clipped frame would never be reported as scrolled into view. */
+  .js [data-reveal='wipe'] {
+    opacity: 1;
+    transform: none;
+    background: transparent;
+  }
+  .js [data-reveal='wipe'] > :is(picture, div) {
+    position: absolute;
+    inset: 0;
+    display: block;
+    background: var(--photo-tone);
+    clip-path: inset(100% 0 0 0);
+    transition: clip-path 1.3s var(--ease-out-expo);
+    transition-delay: var(--reveal-delay, 0s);
+  }
+  .js [data-reveal='wipe'] img {
+    scale: 1.3;
+    transition: scale 1.8s var(--ease-out-expo);
+    transition-delay: var(--reveal-delay, 0s);
+  }
+  .js [data-reveal='wipe'].is-in > :is(picture, div) {
+    clip-path: inset(0);
+  }
+  .js [data-reveal='wipe'].is-in img {
+    scale: var(--img-scale, 1);
+  }
+
+  /* Groups: children arrive one after another (motion.ts numbers them). */
+  .js [data-stagger] > * {
+    opacity: 0;
+    transform: translate3d(0, 28px, 0);
+    transition:
+      opacity 0.9s var(--ease-out-expo),
+      transform 1s var(--ease-out-expo);
+    transition-delay: calc(var(--stagger-start, 0s) + var(--stagger-index, 0) * 0.07s);
+  }
+  .js [data-stagger].is-in > * {
     opacity: 1;
     transform: none;
   }
@@ -447,11 +551,18 @@ html.lenis body {
     }
   }
 
-  /* Scroll-linked parallax where the browser supports it (Chrome/Android, Safari 26+). */
+  /* Scroll-linked parallax where the browser supports it (Chrome/Android, Safari 26+).
+     Longhands on purpose: the minifier would otherwise fold animation-timeline into the
+     animation shorthand, which Chrome rejects, silently switching every effect off. */
   @supports (animation-timeline: view()) {
-    [data-parallax] {
-      animation: parallax linear both;
-      animation-timeline: view();
+    /* Floating layouts only: on phones these items stack, and moving them would collide. */
+    @media (min-width: 768px) {
+      [data-parallax] {
+        animation-name: parallax;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: view();
+      }
     }
     @keyframes parallax {
       from {
@@ -462,7 +573,9 @@ html.lenis body {
       }
     }
     [data-zoom-out] {
-      animation: zoom-out linear both;
+      animation-name: zoom-out;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
       animation-timeline: view();
       animation-range: entry 0% exit 30%;
     }
@@ -477,7 +590,9 @@ html.lenis body {
     [data-draw] {
       stroke-dasharray: 1;
       stroke-dashoffset: 1;
-      animation: draw linear both;
+      animation-name: draw;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
       animation-timeline: view();
       animation-range: entry 10% cover 60%;
     }
@@ -487,7 +602,9 @@ html.lenis body {
       }
     }
     [data-drift] {
-      animation: drift linear both;
+      animation-name: drift;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
       animation-timeline: view();
     }
     @keyframes drift {
@@ -496,6 +613,102 @@ html.lenis body {
       }
       to {
         transform: translate3d(-8%, 0, 0);
+      }
+    }
+    /* Photo drifts inside its frame; the slight zoom keeps the edges covered. */
+    [data-parallax-img] {
+      --img-scale: 1.14;
+    }
+    [data-parallax-img] img {
+      scale: var(--img-scale);
+      animation-name: img-parallax;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-timeline: view();
+    }
+    @keyframes img-parallax {
+      from {
+        translate: 0 -6%;
+      }
+      to {
+        translate: 0 6%;
+      }
+    }
+
+    /* A frame that turns a few degrees while its photo stays upright. */
+    [data-tilt],
+    [data-tilt] img {
+      animation-name: tilt;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-timeline: view();
+    }
+    [data-tilt] img {
+      animation-direction: reverse;
+    }
+    @keyframes tilt {
+      from {
+        rotate: 7deg;
+      }
+      to {
+        rotate: -7deg;
+      }
+    }
+
+    /* Hero: as it scrolls away the photo lags behind and the words lift and fade. */
+    .hero {
+      view-timeline: --hero block;
+    }
+    .hero-photo {
+      animation-name: hero-photo;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-timeline: --hero;
+      animation-range: exit 0% exit 100%;
+    }
+    @keyframes hero-photo {
+      to {
+        translate: 0 28%;
+        scale: 1.08;
+      }
+    }
+    .hero-copy {
+      animation-name: hero-copy;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-timeline: --hero;
+      animation-range: exit 0% exit 80%;
+    }
+    @keyframes hero-copy {
+      to {
+        opacity: 0;
+        translate: 0 -14%;
+      }
+    }
+  }
+
+  /* Reading progress: a hairline across the top of the window. */
+  @supports (animation-timeline: scroll()) {
+    .scroll-progress {
+      display: block;
+      position: fixed;
+      inset: 0 0 auto;
+      z-index: 45;
+      height: 2px;
+      background: var(--color-brand);
+      transform-origin: 0 50%;
+      pointer-events: none;
+      animation-name: scroll-progress;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-timeline: scroll(root block);
+    }
+    @keyframes scroll-progress {
+      from {
+        transform: scaleX(0);
+      }
+      to {
+        transform: scaleX(1);
       }
     }
   }

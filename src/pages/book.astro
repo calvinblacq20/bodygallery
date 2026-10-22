@@ -30,7 +30,7 @@ const serviceDetail = (s: (typeof live)[number]['data']) =>
   title="Book · Body Gallery Kasoa"
   description="Pick a treatment, a day and a time. WhatsApp opens with your booking written out, ready to send to Body Gallery in Kasoa."
   settings={settings}
-  bookBar={false}
+  bookAction={false}
 >
   <section class="wrap pt-32 md:pt-40">
     <LetterTitle text="Book" />
@@ -48,7 +48,8 @@ const serviceDetail = (s: (typeof live)[number]['data']) =>
       class="aspect-[4/3] md:aspect-[16/6]"
       widths={[800, 1200]}
       eager
-      data-reveal="fade"
+      data-reveal="wipe"
+      data-parallax-img=""
     />
   </div>
 

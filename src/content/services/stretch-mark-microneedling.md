@@ -7,7 +7,7 @@ featured: true
 order: 20
 photo:
   src: ../../assets/photos/stretch-mark-microneedling.jpg
-  alt: 'Gloved hands holding a microneedling pen during a treatment'
+  alt: "Gloved hand holding a microneedling pen close to a client's forehead"
 sessions: 'A course of sessions, spaced a few weeks apart. Your plan, including how many sessions you need, is confirmed at your consultation.'
 downtime: 'Skin usually looks pink and feels warm for a day or two.'
 suits: ["You'd like to soften the look of stretch marks", 'You can commit to a course of sessions']

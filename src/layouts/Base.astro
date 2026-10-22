@@ -6,6 +6,7 @@ import '../styles/global.css';
 import headingFont from '@fontsource-variable/instrument-sans/files/instrument-sans-latin-wdth-normal.woff2?url';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
+import QuickActions from '../components/QuickActions.astro';
 import type { Settings } from '../content/schemas';
 import { generalBookingUrl } from '../lib/booking';
 import { JS_FLAG_SCRIPT } from '../lib/inline-scripts';
@@ -16,11 +17,11 @@ interface Props {
   description: string;
   settings: Settings;
   headerTone?: 'light' | 'dark';
-  /** Sticky "Book on WhatsApp" bar on phones; off where the page itself is the booking flow. */
-  bookBar?: boolean;
+  /** Book button in the on-screen Book / Call / WhatsApp actions; off where the page is the booking flow. */
+  bookAction?: boolean;
 }
 
-const { title, description, settings, headerTone = 'dark', bookBar = true } = Astro.props;
+const { title, description, settings, headerTone = 'dark', bookAction = true } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const bookUrl = generalBookingUrl(settings.whatsappE164);
 ---
@@ -52,17 +53,14 @@ const bookUrl = generalBookingUrl(settings.whatsappE164);
     >
       Skip to content
     </a>
+    <div class="scroll-progress" aria-hidden="true"></div>
     <Header tone={headerTone} />
     <main id="main">
       <slot />
     </main>
     <Footer settings={settings} bookUrl={bookUrl} />
 
-    {bookBar && (
-      <a href={bookUrl} class="book-bar" data-event="book_whatsapp" data-event-label="sticky-bar">
-        Book on WhatsApp <span aria-hidden="true">→</span>
-      </a>
-    )}
+    <QuickActions settings={settings} book={bookAction} />
 
     <script>
       import '../scripts/motion';
@@ -71,33 +69,11 @@ const bookUrl = generalBookingUrl(settings.whatsappE164);
 </html>
 
 <style>
-  .book-bar {
-    display: none;
-  }
   @media (max-width: 767px) {
-    .book-bar {
-      display: flex;
-    }
-  }
-  .book-bar {
-    position: fixed;
-    inset: auto 12px max(12px, env(safe-area-inset-bottom)) 12px;
-    z-index: 40;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    min-height: 52px;
-    border-radius: 8px;
-    background: var(--color-ink);
-    color: var(--color-snow);
-    font-weight: 500;
-    box-shadow: 0 10px 30px rgb(0 0 0 / 0.18);
-  }
-  @media (max-width: 767px) {
-    :global(body:has(.book-bar)) {
-      /* Full-height sections subtract this so the bar never covers their last line. */
-      --book-bar-space: 76px;
-      padding-bottom: var(--book-bar-space);
+    :global(body:has(.quick-actions)) {
+      /* Full-height sections subtract this so the action bar never covers their last line. */
+      --action-bar-space: 80px;
+      padding-bottom: var(--action-bar-space);
     }
   }
 </style>

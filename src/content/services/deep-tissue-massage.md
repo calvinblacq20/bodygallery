@@ -8,7 +8,7 @@ featured: true
 order: 3
 photo:
   src: ../../assets/photos/deep-tissue-massage.jpg
-  alt: "Massage therapist working on a woman's shoulder"
+  alt: "Therapist's hands massaging a woman's temples"
 suits:
   [
     'You have stubborn knots or tension',

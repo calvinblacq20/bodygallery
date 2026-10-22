@@ -8,7 +8,7 @@ featured: true
 order: 2
 photo:
   src: ../../assets/photos/swedish-massage.jpg
-  alt: 'Woman smiling with her eyes closed during a full-body massage'
+  alt: 'Woman relaxing face-up on a massage table with her eyes closed'
 suits:
   [
     'You want to switch off completely',

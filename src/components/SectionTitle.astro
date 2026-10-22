@@ -21,6 +21,11 @@ const {
 } = Astro.props;
 const labelClass = size === 'lg' ? 't-label' : 't-label-sm';
 const accentClass = size === 'lg' ? 't-accent' : 't-accent-sm';
+const lines = [
+  { text: label, class: labelClass },
+  { text: accent, class: accentClass },
+];
+if (accentFirst) lines.reverse();
 ---
 
 <Tag
@@ -29,17 +34,11 @@ const accentClass = size === 'lg' ? 't-accent' : 't-accent-sm';
     align === 'center' ? 'items-center text-center' : 'items-start',
     className,
   ]}
-  data-reveal
+  data-reveal="lines"
 >
-  {accentFirst ? (
-    <>
-      <span class={accentClass}>{accent}</span>
-      <span class={labelClass}>{label}</span>
-    </>
-  ) : (
-    <>
-      <span class={labelClass}>{label}</span>
-      <span class={accentClass}>{accent}</span>
-    </>
-  )}
+  {lines.map((line, i) => (
+    <span class:list={['line', line.class]} style={`--line:${i}`}>
+      <span class="line-in">{line.text}</span>
+    </span>
+  ))}
 </Tag>

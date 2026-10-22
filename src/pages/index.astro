@@ -12,6 +12,7 @@ import ovalPhoto from '../assets/photos/oval.jpg';
 import statementPhoto from '../assets/photos/statement.jpg';
 import SectionTitle from '../components/SectionTitle.astro';
 import ServiceCard from '../components/ServiceCard.astro';
+import TreatmentBand from '../components/TreatmentBand.astro';
 import TreatmentShowcase from '../components/TreatmentShowcase.astro';
 import Base from '../layouts/Base.astro';
 import { generalBookingUrl } from '../lib/booking';
@@ -67,7 +68,7 @@ const values = [
   headerTone="light"
 >
   <!-- Hero -->
-  <section class="relative flex min-h-[calc(100svh_-_var(--book-bar-space,0px))] flex-col overflow-hidden text-white">
+  <section class="hero relative flex min-h-[calc(100svh_-_var(--action-bar-space,0px))] flex-col overflow-hidden text-white">
     <Photo
       src={heroPhoto}
       alt="Close-up of a woman's glowing skin"
@@ -75,12 +76,12 @@ const values = [
       widths={[800, 1400, 2000]}
       tone="deep"
       note="Hero: close-up portrait, warm studio light, calm expression"
-      class="absolute inset-0"
+      class="hero-photo absolute inset-0"
       eager
       data-note-pos="mid"
     />
     <div class="absolute inset-0 bg-gradient-to-b from-black/30 via-black/10 to-black/35"></div>
-    <div class="wrap relative mt-auto pt-32 pb-[2.5vw]">
+    <div class="hero-copy wrap relative mt-auto pt-32 pb-[2.5vw]">
       <div class="mb-6 max-w-[34rem] md:mb-8" data-reveal>
         <h1 class="t-body-lg">
           Spa rituals and body treatments in Kasoa. Unhurried, honest, and priced for real life.
@@ -143,7 +144,7 @@ const values = [
           class="relative mx-auto aspect-[3/4] w-[78%] md:absolute md:top-[2%] md:left-[30%] md:w-[44%]"
           data-reveal="fade"
         >
-          <div class="oval h-full w-full">
+          <div class="oval h-full w-full" data-tilt>
             <Photo
               src={ovalPhoto}
               alt="Smiling woman with glowing skin"
@@ -188,14 +189,15 @@ const values = [
     <div class="grid grid-cols-[minmax(0,1fr)] md:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
       <Photo
         src={exploreSpaPhoto}
-        alt="Woman smiling with her eyes closed on a massage table"
-        position="50% 35%"
+        alt="Woman in a white spa robe relaxing by a window"
+        position="50% 30%"
         sizes="46vw"
         widths={[600, 1000, 1200]}
         tone="warm"
         note="Massage in progress, low warm light"
         class="hidden md:block md:aspect-square"
-        data-reveal="fade"
+        data-reveal="wipe"
+        data-parallax-img=""
       />
       <div class="wrap min-w-0 self-center md:!max-w-none md:pl-12 md:pr-[5.6vw]" data-carousel>
         <div class="flex items-end justify-between gap-4">
@@ -294,7 +296,8 @@ const values = [
         tone="blush"
         note="Ombré brows result, close-up"
         class="hidden md:block md:aspect-square"
-        data-reveal="fade"
+        data-reveal="wipe"
+        data-parallax-img=""
       />
     </div>
   </section>
@@ -314,9 +317,13 @@ const values = [
     <div class="absolute inset-0 bg-black/25"></div>
     <div class="wrap relative">
       <div class="relative">
-        <h2 class="statement-title" data-reveal>
-          <span class="block">Your body,</span>
-          <span class="block">your choice</span>
+        <h2 class="statement-title" data-reveal="lines">
+          <span class="line">
+            <span class="line-in">Your body,</span>
+          </span>
+          <span class="line" style="--line:1">
+            <span class="line-in">your choice</span>
+          </span>
         </h2>
         <p
           class="mt-8 max-w-[34ch] text-sm md:mt-12 md:ml-auto md:text-[0.95rem]"
@@ -358,6 +365,8 @@ const values = [
       </div>
     </div>
   </section>
+
+  <TreatmentBand />
 
   <TreatmentShowcase services={services} whatsappE164={settings.whatsappE164} />
 

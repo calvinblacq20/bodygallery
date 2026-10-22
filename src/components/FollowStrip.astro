@@ -26,11 +26,15 @@ const tiles = [
 ---
 
 <section class="overflow-hidden bg-cream py-24 md:py-32">
-  <h2 class="flex flex-col items-center text-center" data-reveal>
-    <span class="t-label">Follow us</span>
-    <a href={tiktokUrl} rel="noopener" class="t-accent hover:text-brand">
-      {handle}
-    </a>
+  <h2 class="flex flex-col items-center text-center" data-reveal="lines">
+    <span class="line t-label">
+      <span class="line-in">Follow us</span>
+    </span>
+    <span class="line t-accent" style="--line:1">
+      <a href={tiktokUrl} rel="noopener" class="line-in hover:text-brand">
+        {handle}
+      </a>
+    </span>
   </h2>
   <div class="mt-14 flex items-center justify-center gap-3 md:gap-5" data-drift>
     {tiles.map((t) => (

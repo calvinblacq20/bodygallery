@@ -1,0 +1,89 @@
+---
+import type { Settings } from '../content/schemas';
+import { generalBookingUrl } from '../lib/booking';
+import { telHref } from '../lib/format';
+import Icon from './Icon.astro';
+
+interface Props {
+  settings: Settings;
+  /** Off on /book, where the page itself is the booking flow. */
+  book?: boolean;
+}
+
+const { settings, book = true } = Astro.props;
+// Calls go to the line labelled for calls when there is one; WhatsApp stays on the bookings line.
+const callPhone = settings.phones.find((p) => /call/i.test(p.label)) ?? settings.phones[0];
+---
+
+<nav class="quick-actions" aria-label="Book, call or WhatsApp">
+  {book && (
+    <a href="/book" data-event="book_helper" data-event-label="quick-actions">
+      <Icon name="calendar" size={18} /> Book
+    </a>
+  )}
+  {callPhone && (
+    <a href={telHref(callPhone.e164)} data-event="call_click" data-event-label="quick-actions">
+      <Icon name="phone" size={18} /> Call
+    </a>
+  )}
+  <a
+    href={generalBookingUrl(settings.whatsappE164)}
+    rel="noopener"
+    data-event="book_whatsapp"
+    data-event-label="quick-actions"
+  >
+    <Icon name="chat" size={18} /> WhatsApp
+  </a>
+</nav>
+
+<style>
+  /* Phones: a bar across the bottom. Larger screens: a pill in the bottom-right corner. */
+  .quick-actions {
+    position: fixed;
+    z-index: 40;
+    inset: auto 12px max(12px, env(safe-area-inset-bottom)) 12px;
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    min-height: 56px;
+    overflow: hidden;
+    border-radius: 10px;
+    background: var(--color-ink);
+    color: var(--color-snow);
+    font-size: 0.95rem;
+    font-weight: 500;
+    box-shadow: 0 10px 30px rgb(0 0 0 / 0.2);
+  }
+  .quick-actions a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    min-height: 56px;
+    padding: 0 0.75rem;
+    transition: background-color 0.2s;
+  }
+  .quick-actions a + a {
+    border-left: 1px solid rgb(255 255 255 / 0.16);
+  }
+  .quick-actions a:hover {
+    background: rgb(255 255 255 / 0.1);
+  }
+  .quick-actions a:focus-visible {
+    outline: 2px solid var(--color-snow);
+    outline-offset: -4px;
+  }
+  @media (min-width: 768px) {
+    .quick-actions {
+      inset: auto 24px 24px auto;
+      grid-auto-columns: auto;
+      min-height: 52px;
+      border-radius: 999px;
+      font-size: 0.9rem;
+    }
+    .quick-actions a {
+      min-height: 52px;
+      padding: 0 1.25rem;
+    }
+  }
+</style>

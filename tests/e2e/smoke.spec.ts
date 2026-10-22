@@ -55,6 +55,27 @@ test('the Sunday special explains its day rule in the message', async ({ page })
   expect(messageOf(href)).toContain('Sundays only');
 });
 
+test('Book, Call and WhatsApp stay on screen while scrolling', async ({ page }) => {
+  const actions = page.getByRole('navigation', { name: 'Book, call or WhatsApp' });
+  await page.goto('/services/hammam');
+  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight / 2));
+
+  const book = actions.getByRole('link', { name: 'Book', exact: true });
+  const call = actions.getByRole('link', { name: 'Call', exact: true });
+  const whatsapp = actions.getByRole('link', { name: 'WhatsApp', exact: true });
+  for (const link of [book, call, whatsapp]) await expect(link).toBeInViewport();
+  await expect(book).toHaveAttribute('href', '/book');
+  await expect(call).toHaveAttribute('href', 'tel:+233544944820');
+  expect(messageOf(await whatsapp.getAttribute('href'))).not.toBe('');
+  expect(await whatsapp.getAttribute('href')).toMatch(/^https:\/\/wa\.me\/233540185528\?text=/);
+
+  // The booking page is the Book flow itself, so only Call and WhatsApp remain.
+  await page.goto('/book');
+  await expect(book).toHaveCount(0);
+  await expect(call).toBeInViewport();
+  await expect(whatsapp).toBeInViewport();
+});
+
 test('pages never scroll sideways', async ({ page }) => {
   for (const path of [
     '/',

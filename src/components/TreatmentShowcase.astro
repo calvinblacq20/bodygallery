@@ -1,7 +1,7 @@
 ---
 import type { ImageMetadata } from 'astro';
 import type { CollectionEntry } from 'astro:content';
-import consultationPhoto from '../assets/photos/consultation.jpg';
+import stripOilPhoto from '../assets/photos/strip-oil.jpg';
 import { serviceBookingUrl } from '../lib/booking';
 import { formatDuration, priceText } from '../lib/format';
 import Icon from './Icon.astro';
@@ -35,7 +35,7 @@ const GROUPS: Group[] = [
     accent: 'treatment',
     text: 'Two ways to soften the look of stretch marks: microneedling and fibroblast (plasma). Both start with a consultation to check which one suits your skin.',
     items: ['stretch-mark-microneedling', 'fibroblast-stretch-marks'],
-    photo: { src: consultationPhoto, alt: "Practitioner in a white coat treating a client's skin" },
+    photo: { src: stripOilPhoto, alt: 'Hand resting on glowing, oiled skin' },
     position: '50% 55%',
   },
   {
@@ -113,9 +113,10 @@ const groups = GROUPS.map((g) => {
           class:list={['aspect-[4/5] rounded-md md:aspect-[5/6]', i % 2 === 1 && 'md:order-2']}
           sizes="(min-width: 768px) 45vw, 100vw"
           widths={[500, 800, 1200]}
-          data-reveal="fade"
+          data-reveal="wipe"
+          data-parallax-img=""
         />
-        <div data-reveal>
+        <div data-stagger>
           <p class="flex flex-wrap gap-2 text-xs">
             <span class="rounded-full border border-line px-3 py-1 text-muted">
               {String(i + 1).padStart(2, '0')}
@@ -125,12 +126,16 @@ const groups = GROUPS.map((g) => {
             )}
           </p>
           <h3 class="mt-5">
-            <span class="t-label block">{g.label}</span>
-            <span class="t-accent block">{g.accent}</span>
+            <span class="line t-label">
+              <span class="line-in">{g.label}</span>
+            </span>
+            <span class="line t-accent" style="--line:1">
+              <span class="line-in">{g.accent}</span>
+            </span>
           </h3>
           <p class="mt-5 max-w-[46ch] text-[1.05rem] leading-relaxed">{g.text}</p>
 
-          <ul class="mt-8 border-t border-line">
+          <ul class="mt-8 border-t border-line" data-stagger>
             {g.items.map((s) => (
               <li class="flex items-center justify-between gap-4 border-b border-line py-4">
                 <a href={`/services/${s.id}`} class="group min-w-0">

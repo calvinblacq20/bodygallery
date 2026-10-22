@@ -27,8 +27,12 @@ const {
 <section class="bg-ink py-20 text-snow md:py-28">
   <div class="wrap flex flex-col items-center text-center" data-reveal>
     <h2 class="flex flex-col items-center">
-      <span class="t-label">{label}</span>
-      <span class="t-accent">{accent}</span>
+      <span class="line t-label">
+        <span class="line-in">{label}</span>
+      </span>
+      <span class="line t-accent" style="--line:1">
+        <span class="line-in">{accent}</span>
+      </span>
     </h2>
     <p class="mt-5 max-w-[40ch] text-white/75">{text}</p>
     <div class="mt-8 flex flex-wrap justify-center gap-3">
