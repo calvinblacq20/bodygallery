@@ -1,0 +1,49 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { serviceBookingUrl } from '../lib/booking';
+import { priceText } from '../lib/format';
+import Icon from './Icon.astro';
+import Photo from './Photo.astro';
+
+interface Props {
+  service: CollectionEntry<'services'>;
+  whatsappE164: string;
+  label: string;
+  tint?: 'cream' | 'blush';
+}
+
+const { service, whatsappE164, label, tint = 'cream' } = Astro.props;
+const s = service.data;
+---
+
+<article
+  data-slide
+  class:list={[
+    'relative flex w-[78vw] max-w-[300px] shrink-0 snap-start flex-col rounded-lg p-4 sm:w-[300px]',
+    tint === 'blush' ? 'bg-blush' : 'bg-cream',
+  ]}
+>
+  <div class="flex items-center justify-between">
+    <span class="rounded-full bg-white px-3 py-1 text-xs">{label}</span>
+    <a
+      href={serviceBookingUrl(whatsappE164, s)}
+      class="grid h-11 w-11 place-items-center rounded-full bg-white transition-colors hover:bg-ink hover:text-snow"
+      aria-label={`Book ${s.name} on WhatsApp`}
+      data-event="book_whatsapp"
+      data-event-label={service.id}
+    >
+      <Icon name="arrow-up-right" size={18} />
+    </a>
+  </div>
+  <Photo
+    src={s.photo?.src}
+    alt={s.photo?.alt ?? s.name}
+    tone={tint === 'blush' ? 'blush' : 'cream'}
+    class="my-4 aspect-[4/5] rounded-md"
+    sizes="300px"
+  />
+  <div class="mt-auto flex items-end justify-between gap-3 text-sm">
+    <h3 class="font-medium leading-tight">{s.name}</h3>
+    <p class="shrink-0 text-right">{priceText(s)}</p>
+  </div>
+</article>

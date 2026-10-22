@@ -1,0 +1,75 @@
+---
+/**
+ * Full-width brand word (decorative). Letters rise from individual masks when the word
+ * scrolls into view. Font size is tuned so "BODY GALLERY" spans the container.
+ */
+interface Props {
+  text: string;
+  class?: string;
+}
+
+const { text, class: className = '' } = Astro.props;
+const words = text.split(' ');
+let index = 0;
+---
+
+<p class:list={['giant-word letter-rise', className]} aria-hidden="true" data-reveal>
+  {words.map((word, w) => (
+    <span class="giant-line">
+      {[...word].map((ch) => (
+        <span class="mask">
+          <span class="ch" style={`--i:${index++}`}>
+            {ch}
+          </span>
+        </span>
+      ))}
+      {w < words.length - 1 && <span class="giant-gap"> </span>}
+    </span>
+  ))}
+</p>
+
+<style>
+  /*
+   * Sized from measured Instrument Sans proportions (500 weight, -0.04em tracking) so the word
+   * fills the .wrap content box exactly: "GALLERY" is 4.28em wide, "BODY GALLERY" 7.10em.
+   * Divisors carry ~1.5% slack for scrollbars and rounding.
+   */
+  .giant-word {
+    --content: calc(min(100vw, 1720px) - 2 * max(20px, 5.6vw));
+    display: flex;
+    flex-wrap: wrap;
+    font-weight: 500;
+    line-height: 0.82;
+    letter-spacing: -0.04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    /* Phones: one word per line, sized so the longer word spans the width. */
+    font-size: calc(var(--content) / 4.35);
+  }
+  .giant-line {
+    display: flex;
+    width: 100%;
+  }
+  .giant-gap {
+    display: none;
+  }
+  .mask {
+    display: inline-block;
+    overflow: hidden;
+    padding-bottom: 0.04em;
+    margin-bottom: -0.04em;
+  }
+  @media (min-width: 768px) {
+    .giant-word {
+      flex-wrap: nowrap;
+      font-size: calc(var(--content) / 7.2);
+    }
+    .giant-line {
+      width: auto;
+    }
+    .giant-gap {
+      display: inline-block;
+      width: 0.155em;
+    }
+  }
+</style>

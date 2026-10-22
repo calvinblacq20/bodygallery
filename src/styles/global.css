@@ -1,0 +1,323 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Instrument Sans Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-serif: 'Instrument Serif', ui-serif, Georgia, serif;
+
+  --color-ink: #0b0b0b;
+  --color-paper: #f5f5f3;
+  --color-snow: #fcfcfb;
+  --color-mist: #efefec;
+  --color-cream: #f6f0ea;
+  --color-blush: #fbe8e6;
+  --color-muted: #5c5856;
+  --color-line: #d9d6d2;
+  /* Body Gallery burgundy, kept as a token so it can be swapped in for black in one place. */
+  --color-brand: #4f1724;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Small print stays legible on budget phones: 15px rather than Tailwind's 14px. */
+  --text-sm: 0.9375rem;
+  --text-sm--line-height: 1.45;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    @apply bg-snow font-sans text-ink;
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+  ::selection {
+    background: var(--color-brand);
+    color: var(--color-snow);
+  }
+  :focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 3px;
+  }
+  /* Tailwind v4 resets buttons to the default cursor. */
+  button:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
+@layer components {
+  .wrap {
+    width: 100%;
+    max-width: 1720px;
+    margin-inline: auto;
+    padding-inline: max(20px, 5.6vw);
+  }
+
+  /* Type scale: uppercase grotesk labels paired with a condensed serif italic accent. */
+  .t-display {
+    font-weight: 500;
+    font-size: clamp(3.25rem, 8.4vw, 8.5rem);
+    line-height: 0.9;
+    letter-spacing: -0.035em;
+    text-transform: uppercase;
+  }
+  .t-label {
+    font-weight: 500;
+    font-size: clamp(1.6rem, 3.4vw, 3.5rem);
+    line-height: 0.95;
+    letter-spacing: -0.025em;
+    text-transform: uppercase;
+  }
+  .t-label-sm {
+    font-weight: 500;
+    font-size: clamp(1.45rem, 2.3vw, 2.4rem);
+    line-height: 1;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+  }
+  .t-accent {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(2.3rem, 5.3vw, 5.6rem);
+    line-height: 0.92;
+    letter-spacing: -0.01em;
+  }
+  .t-accent-sm {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(1.65rem, 2.6vw, 2.75rem);
+    line-height: 0.95;
+  }
+  .t-body-lg {
+    font-size: clamp(1.15rem, 1.55vw, 1.6rem);
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+  }
+
+  .link-underline {
+    background: linear-gradient(currentColor, currentColor) 0 100% / 100% 1px no-repeat;
+    padding-bottom: 2px;
+    transition: background-size 0.5s var(--ease-out-expo);
+  }
+  .link-underline:hover {
+    background-size: 0% 1px;
+    background-position: 100% 100%;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 44px;
+    padding: 0.55rem 1.1rem;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition:
+      background-color 0.3s ease,
+      color 0.3s ease,
+      border-color 0.3s ease;
+  }
+  .btn-solid {
+    background: var(--color-ink);
+    color: var(--color-snow);
+  }
+  .btn-solid:hover {
+    background: var(--color-brand);
+  }
+  .btn-ghost-light {
+    border: 1px solid rgb(255 255 255 / 0.75);
+    color: #fff;
+  }
+  .btn-ghost-light:hover {
+    background: #fff;
+    color: var(--color-ink);
+  }
+
+  .icon-btn {
+    display: inline-grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 999px;
+    background: var(--color-ink);
+    color: var(--color-snow);
+    transition:
+      transform 0.4s var(--ease-out-expo),
+      background-color 0.3s ease;
+  }
+  .icon-btn:hover {
+    transform: scale(1.06);
+    background: var(--color-brand);
+  }
+  .icon-btn:disabled {
+    opacity: 0.3;
+    transform: none;
+  }
+
+  /* Image slot: renders the real photo when content provides one, otherwise a warm art-directed block. */
+  .photo-slot {
+    position: relative;
+    overflow: hidden;
+    background: var(--photo-tone, #8f6f60);
+  }
+  .photo-slot[data-tone='deep'] {
+    --photo-tone: radial-gradient(120% 90% at 55% 35%, #9a7262 0%, #5d4136 45%, #2c1f1a 100%);
+  }
+  .photo-slot[data-tone='warm'] {
+    --photo-tone: radial-gradient(110% 90% at 40% 30%, #d7b5a3 0%, #a77d68 50%, #6d4c3f 100%);
+  }
+  .photo-slot[data-tone='blush'] {
+    --photo-tone: radial-gradient(100% 100% at 50% 30%, #f3d9d2 0%, #d9b2a6 60%, #b88c80 100%);
+  }
+  .photo-slot[data-tone='cream'] {
+    --photo-tone: radial-gradient(100% 100% at 50% 40%, #f4ebe2 0%, #e3d3c4 60%, #c9b39f 100%);
+  }
+  .photo-slot > img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .photo-note {
+    position: absolute;
+    inset: 0.75rem auto auto 0.75rem;
+    max-width: 70%;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    background: rgb(0 0 0 / 0.28);
+    color: rgb(255 255 255 / 0.85);
+    font-size: 0.7rem;
+    line-height: 1.3;
+  }
+  /* Full-bleed heroes keep the note clear of the header and the bottom copy. */
+  .photo-slot[data-note-pos='mid'] .photo-note {
+    inset: 38% 0.75rem auto auto;
+  }
+}
+
+/* ---------- Motion ---------- */
+
+/* Smooth scroll (Lenis) housekeeping. */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: clip;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Scroll reveal: hidden only once JS is confirmed, so no-JS visitors always see content. */
+  .js [data-reveal] {
+    opacity: 0;
+    transform: translate3d(0, 36px, 0);
+    transition:
+      opacity 1s var(--ease-out-expo),
+      transform 1.1s var(--ease-out-expo);
+    transition-delay: var(--reveal-delay, 0s);
+  }
+  .js [data-reveal='fade'] {
+    transform: none;
+  }
+  .js [data-reveal].is-in {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Page titles: letters settle into place from staggered heights. */
+  .letter-drop .ch {
+    display: inline-block;
+    animation: letter-drop 1.15s var(--ease-out-expo) both;
+    animation-delay: calc(0.15s + var(--i) * 0.055s);
+  }
+  @keyframes letter-drop {
+    from {
+      opacity: 0.15;
+      transform: translate3d(0, var(--dy, 0.35em), 0);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* Giant words: each letter rises out of its own mask. */
+  .letter-rise .ch {
+    display: inline-block;
+    transform: translate3d(0, 105%, 0);
+    animation: letter-rise 1.3s var(--ease-out-expo) forwards;
+    animation-delay: calc(0.25s + var(--i) * 0.045s);
+  }
+  .js .letter-rise[data-reveal] {
+    opacity: 1;
+    transform: none;
+  }
+  .js .letter-rise[data-reveal]:not(.is-in) .ch {
+    animation-play-state: paused;
+  }
+  @keyframes letter-rise {
+    to {
+      transform: none;
+    }
+  }
+
+  /* Scroll-linked parallax where the browser supports it (Chrome/Android, Safari 26+). */
+  @supports (animation-timeline: view()) {
+    [data-parallax] {
+      animation: parallax linear both;
+      animation-timeline: view();
+    }
+    @keyframes parallax {
+      from {
+        transform: translate3d(0, calc(var(--parallax, 60px) * 1), 0);
+      }
+      to {
+        transform: translate3d(0, calc(var(--parallax, 60px) * -1), 0);
+      }
+    }
+    [data-zoom-out] {
+      animation: zoom-out linear both;
+      animation-timeline: view();
+      animation-range: entry 0% exit 30%;
+    }
+    @keyframes zoom-out {
+      from {
+        transform: scale(1.18);
+      }
+      to {
+        transform: scale(1);
+      }
+    }
+    [data-draw] {
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+      animation: draw linear both;
+      animation-timeline: view();
+      animation-range: entry 10% cover 60%;
+    }
+    @keyframes draw {
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+    [data-drift] {
+      animation: drift linear both;
+      animation-timeline: view();
+    }
+    @keyframes drift {
+      from {
+        transform: translate3d(8%, 0, 0);
+      }
+      to {
+        transform: translate3d(-8%, 0, 0);
+      }
+    }
+  }
+}

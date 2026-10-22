@@ -1,0 +1,75 @@
+---
+import LetterTitle from '../components/LetterTitle.astro';
+import PackagesSection from '../components/PackagesSection.astro';
+import Photo from '../components/Photo.astro';
+import SectionTitle from '../components/SectionTitle.astro';
+import ServiceRow from '../components/ServiceRow.astro';
+import Base from '../layouts/Base.astro';
+import { SERVICE_CATEGORIES } from '../content/schemas';
+import { CATEGORY_TITLES, loadSite } from '../lib/site';
+
+const { settings, services, packages } = await loadSite();
+const groups = SERVICE_CATEGORIES.map((category) => ({
+  category,
+  ...CATEGORY_TITLES[category],
+  items: services.filter((s) => s.data.category === category),
+})).filter((g) => g.items.length > 0);
+
+const updated = new Date(settings.pricesUpdatedAt).toLocaleDateString('en-GB', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+});
+const strip = [
+  { tone: 'warm', note: 'Hands applying oil' },
+  { tone: 'blush', note: 'Facial mask detail' },
+  { tone: 'deep', note: 'Hot stones close-up' },
+  { tone: 'cream', note: 'Brow mapping' },
+] as const;
+---
+
+<Base
+  title="Services & prices · Body Gallery Kasoa"
+  description="Massage from GH₵100, spa packages from GH₵350, facials, waxing, pedicures, stretch-mark treatment, laser tattoo removal, ombré brows and lip blush in Kasoa."
+  settings={settings}
+>
+  <section class="wrap pt-32 md:pt-40">
+    <LetterTitle text="Services" />
+    <p class="mt-4 max-w-[36ch] text-sm" data-reveal>
+      Spa rituals and body treatments in Kasoa. Prices in Ghana cedis, updated {updated}.
+    </p>
+  </section>
+
+  <div class="wrap mt-12 grid grid-cols-2 gap-2 md:mt-16 md:grid-cols-4">
+    {strip.map((p, i) => (
+      <Photo
+        alt="A Body Gallery treatment in progress"
+        tone={p.tone}
+        note={p.note}
+        class="aspect-[3/4] md:aspect-[4/5]"
+        data-reveal="fade"
+        style={`--reveal-delay:${i * 0.08}s`}
+      />
+    ))}
+  </div>
+
+  <div class="wrap mt-10 flex justify-end md:mt-14">
+    <p class="max-w-[46ch] text-sm text-muted" data-reveal>
+      Every visit starts with a short conversation about what you need. Advanced treatments always
+      begin with a consultation, so you know the plan and the full cost before anything starts.
+    </p>
+  </div>
+
+  {groups.map((group) => (
+    <section id={group.category} class="mt-20 scroll-mt-6 bg-paper py-20 md:mt-28 md:py-28">
+      <SectionTitle label={group.label} accent={group.accent} />
+      <div class="wrap mt-12 flex max-w-[1240px] flex-col gap-4 md:mt-16">
+        {group.items.map((s) => (
+          <ServiceRow service={s} whatsappE164={settings.whatsappE164} />
+        ))}
+      </div>
+    </section>
+  ))}
+
+  <PackagesSection packages={packages} whatsappE164={settings.whatsappE164} />
+</Base>

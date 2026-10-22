@@ -1,0 +1,47 @@
+[
+  {
+    "id": "package-1",
+    "kind": "fixed",
+    "name": "Package 1",
+    "tagline": "Feet, body and face in one visit.",
+    "priceGHS": 350,
+    "includes": [
+      { "service": "pedicure", "label": "Pedicure" },
+      { "service": "swedish-massage", "label": "Massage" },
+      { "service": "facial", "label": "Facial" }
+    ],
+    "order": 1
+  },
+  {
+    "id": "package-2",
+    "kind": "fixed",
+    "name": "Package 2",
+    "tagline": "A brighter smile, fresh skin and soft feet.",
+    "priceGHS": 350,
+    "includes": [
+      { "service": "teeth-whitening", "label": "Teeth whitening" },
+      { "service": "facial", "label": "Facial" },
+      { "service": "pedicure", "label": "Pedicure" }
+    ],
+    "order": 2
+  },
+  {
+    "id": "sunday-special",
+    "kind": "choose",
+    "name": "Sunday Special",
+    "tagline": "Pick any three treatments for one price.",
+    "priceGHS": 350,
+    "choose": {
+      "count": 3,
+      "from": [
+        { "service": "waxing", "label": "Waxing" },
+        { "service": "facial", "label": "Facial" },
+        { "service": "pedicure", "label": "Pedicure" },
+        { "service": "swedish-massage", "label": "Massage" }
+      ]
+    },
+    "availableDays": ["sun"],
+    "notes": "Sundays only, 12–6pm.",
+    "order": 3
+  }
+]

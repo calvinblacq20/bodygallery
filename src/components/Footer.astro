@@ -1,0 +1,108 @@
+---
+import type { Settings } from '../content/schemas';
+import { formatLocalPhone, telHref } from '../lib/format';
+import { formatTime } from '../lib/hours';
+import GiantWord from './GiantWord.astro';
+
+interface Props {
+  settings: Settings;
+  bookUrl: string;
+}
+
+const { settings, bookUrl } = Astro.props;
+const { hours } = settings;
+const weekday = hours.mon;
+const sunday = hours.sun;
+const year = new Date().getFullYear();
+---
+
+<footer class="bg-ink text-snow">
+  <div class="wrap grid gap-12 pt-20 pb-10 md:grid-cols-[1.1fr_1fr_1.2fr] md:pt-24">
+    <div class="space-y-6 text-sm">
+      <div>
+        <p class="font-medium">Visit the gallery</p>
+        <address class="mt-1 not-italic text-white/70">
+          {settings.address.street}
+          <br />
+          {settings.address.locality}, {settings.address.region}
+        </address>
+      </div>
+      <div>
+        <p class="font-medium">Call or WhatsApp</p>
+        <ul class="mt-1 text-white/70">
+          {settings.phones.map((p) => (
+            <li>
+              <a href={telHref(p.e164)} class="hover:text-white" data-event="call_click">
+                {formatLocalPhone(p.e164)}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div>
+        <p class="font-medium">Opening hours</p>
+        <p class="mt-1 text-white/70">
+          {weekday && `Mon–Sat ${formatTime(weekday.open)}–${formatTime(weekday.close)}`}
+          <br />
+          {sunday && `Sun ${formatTime(sunday.open)}–${formatTime(sunday.close)}`}
+        </p>
+      </div>
+    </div>
+
+    <nav aria-label="Footer" class="footer-nav grid grid-cols-2 content-start gap-x-8 text-sm">
+      <a href="/" class="hover:text-white/70">
+        Home
+      </a>
+      <a href={settings.socials.tiktok} rel="noopener" class="hover:text-white/70">
+        TikTok
+      </a>
+      <a href="/services" class="hover:text-white/70">
+        Services
+      </a>
+      <a href={settings.socials.instagram} rel="noopener" class="hover:text-white/70">
+        Instagram
+      </a>
+      <a href="/#packages" class="hover:text-white/70">
+        Packages
+      </a>
+      <a href={settings.socials.googleMaps} rel="noopener" class="hover:text-white/70">
+        Google Maps
+      </a>
+      <a href="/#visit" class="hover:text-white/70">
+        Visit
+      </a>
+    </nav>
+
+    <div class="text-sm">
+      <p class="font-medium uppercase">Ready when you are</p>
+      <p class="mt-1 text-white/70">
+        Send us a message and we'll find you a time. {settings.bookingPolicy}
+      </p>
+      <a
+        href={bookUrl}
+        class="mt-5 flex items-center justify-between border-b border-white/40 pb-2 hover:border-white"
+        data-event="book_whatsapp"
+        data-event-label="footer"
+      >
+        <span>Book on WhatsApp</span>
+        <span aria-hidden="true">→</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="wrap pb-6">
+    <GiantWord text={settings.businessName} />
+    <p class="mt-6 text-xs text-white/60">
+      © {year} {settings.businessName} · {settings.tagline}
+    </p>
+  </div>
+</footer>
+
+<style>
+  /* 44px-tall tap targets for every footer link. */
+  .footer-nav a {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+  }
+</style>

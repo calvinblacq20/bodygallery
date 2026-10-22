@@ -1,0 +1,96 @@
+---
+import '@fontsource-variable/instrument-sans/wdth.css';
+import '@fontsource/instrument-serif/400-italic.css';
+import '../styles/global.css';
+// Preloaded so the giant wordmark doesn't reflow when the web font arrives.
+import headingFont from '@fontsource-variable/instrument-sans/files/instrument-sans-latin-wdth-normal.woff2?url';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import type { Settings } from '../content/schemas';
+import { generalBookingUrl } from '../lib/booking';
+import { JS_FLAG_SCRIPT } from '../lib/inline-scripts';
+import { PRELAUNCH } from '../lib/site';
+
+interface Props {
+  title: string;
+  description: string;
+  settings: Settings;
+  headerTone?: 'light' | 'dark';
+}
+
+const { title, description, settings, headerTone = 'dark' } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const bookUrl = generalBookingUrl(settings.whatsappE164);
+---
+
+<!doctype html>
+<html lang="en-GH">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script is:inline set:html={JS_FLAG_SCRIPT} />
+    <link rel="preload" href={headingFont} as="font" type="font/woff2" crossorigin />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {PRELAUNCH && <meta name="robots" content="noindex, nofollow" />}
+    <meta name="theme-color" content="#fcfcfb" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content="en_GH" />
+  </head>
+  <body>
+    <a
+      href="#main"
+      class="sr-only z-50 rounded bg-ink px-4 py-2 text-snow focus:not-sr-only focus:fixed focus:top-3 focus:left-3"
+    >
+      Skip to content
+    </a>
+    <Header tone={headerTone} bookUrl={bookUrl} />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer settings={settings} bookUrl={bookUrl} />
+
+    <a href={bookUrl} class="book-bar" data-event="book_whatsapp" data-event-label="sticky-bar">
+      Book on WhatsApp <span aria-hidden="true">→</span>
+    </a>
+
+    <script>
+      import '../scripts/motion';
+    </script>
+  </body>
+</html>
+
+<style>
+  .book-bar {
+    display: none;
+  }
+  @media (max-width: 767px) {
+    .book-bar {
+      display: flex;
+    }
+  }
+  .book-bar {
+    position: fixed;
+    inset: auto 12px max(12px, env(safe-area-inset-bottom)) 12px;
+    z-index: 40;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 52px;
+    border-radius: 8px;
+    background: var(--color-ink);
+    color: var(--color-snow);
+    font-weight: 500;
+    box-shadow: 0 10px 30px rgb(0 0 0 / 0.18);
+  }
+  @media (max-width: 767px) {
+    :global(body) {
+      padding-bottom: 76px;
+    }
+  }
+</style>

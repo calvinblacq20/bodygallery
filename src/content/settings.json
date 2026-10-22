@@ -1,0 +1,41 @@
+{
+  "business": {
+    "businessName": "Body Gallery",
+    "tagline": "Your body, your choice",
+    "whatsappE164": "233540185528",
+    "phones": [
+      { "e164": "233540185528", "label": "Bookings & WhatsApp" },
+      { "e164": "233544944820", "label": "Calls" }
+    ],
+    "address": {
+      "street": "Monaco Junction, off Nyanyano Road",
+      "locality": "Kasoa",
+      "region": "Central Region",
+      "country": "GH"
+    },
+    "plusCode": "GH6H+QM Kasoa",
+    "geo": { "lat": 5.5119867, "lng": -0.4208133 },
+    "directions": [
+      "We're just off Nyanyano Road at Monaco Junction, about 1 km from KFC Kasoa.",
+      "Lost? Call or WhatsApp 054 018 5528 and we'll guide you in."
+    ],
+    "hours": {
+      "mon": { "open": "09:00", "close": "19:00" },
+      "tue": { "open": "09:00", "close": "19:00" },
+      "wed": { "open": "09:00", "close": "19:00" },
+      "thu": { "open": "09:00", "close": "19:00" },
+      "fri": { "open": "09:00", "close": "19:00" },
+      "sat": { "open": "09:00", "close": "19:00" },
+      "sun": { "open": "12:00", "close": "18:00" }
+    },
+    "timezone": "Africa/Accra",
+    "closures": [],
+    "socials": {
+      "tiktok": "https://www.tiktok.com/@bodygallery3",
+      "instagram": "https://www.instagram.com/bodysgallery",
+      "googleMaps": "https://maps.google.com/?cid=2239001020016459091"
+    },
+    "bookingPolicy": "Advanced treatments are strictly by appointment. Spa visits are best booked ahead, too.",
+    "pricesUpdatedAt": "2026-10-21"
+  }
+}

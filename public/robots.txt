@@ -1,0 +1,3 @@
+# Pre-launch: keep crawlers out. At launch (PRD M3) allow everything and add the sitemap URL.
+User-agent: *
+Disallow: /

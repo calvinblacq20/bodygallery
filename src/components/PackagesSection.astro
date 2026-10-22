@@ -1,0 +1,80 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { packageBookingUrl } from '../lib/booking';
+import { formatGHS } from '../lib/format';
+import Icon from './Icon.astro';
+import Photo from './Photo.astro';
+
+interface Props {
+  packages: CollectionEntry<'packages'>[];
+  whatsappE164: string;
+}
+
+const { packages, whatsappE164 } = Astro.props;
+const tints = ['bg-paper', 'bg-cream', 'bg-blush'];
+// Desktop cards step down like a staircase, as in the reference layout.
+const offsets = ['md:mt-0', 'md:mt-40', 'md:mt-80'];
+---
+
+<section
+  id="packages"
+  class="relative scroll-mt-6 overflow-hidden pt-24 pb-28 text-ink md:pt-32 md:pb-44"
+>
+  <Photo
+    alt="Close-up of glowing skin after a treatment"
+    tone="deep"
+    note="Packages backdrop: extreme close-up of skin texture, warm light"
+    class="absolute inset-0"
+    data-zoom-out=""
+  />
+  <div class="absolute inset-0 bg-black/20"></div>
+
+  <div class="wrap relative">
+    <h2 class="flex flex-col items-center text-center text-white" data-reveal>
+      <span class="t-label">Packages</span>
+      <span class="t-accent">Self-care, bundled</span>
+    </h2>
+
+    <div class="mt-16 grid gap-5 md:mt-24 md:grid-cols-3 md:items-start md:gap-8 lg:px-[4%]">
+      {packages.map((pkg, i) => {
+        const p = pkg.data;
+        const items = p.kind === 'fixed' ? p.includes : p.choose.from;
+        return (
+          <article
+            class:list={[
+              'flex min-h-[420px] flex-col rounded-lg p-7 md:p-9',
+              tints[i % tints.length],
+              offsets[i % offsets.length],
+            ]}
+            data-reveal
+            style={`--reveal-delay:${i * 0.12}s`}
+          >
+            <h3 class="text-sm">{p.name}</h3>
+            <p class="mt-4 text-[clamp(2.4rem,3.4vw,3.4rem)] leading-none tracking-tight">
+              {formatGHS(p.priceGHS)}
+            </p>
+            <p class="mt-5 max-w-[28ch] text-[1.05rem] leading-snug">{p.tagline}</p>
+            <ul class="mt-auto space-y-1 pt-10 text-[0.95rem]">
+              {p.kind === 'choose' && <li class="text-muted">Choose any {p.choose.count}:</li>}
+              {items.map((item) => (
+                <li>– {item.label}</li>
+              ))}
+            </ul>
+            <div class="mt-6 flex items-end justify-between gap-4">
+              <p class="text-xs text-muted">{p.notes}</p>
+              <a
+                href={packageBookingUrl(whatsappE164, p)}
+                class="icon-btn shrink-0"
+                aria-label={`Book ${p.name} on WhatsApp`}
+                data-event="book_whatsapp"
+                data-event-label={pkg.id}
+              >
+                <Icon name="arrow-up-right" size={18} />
+              </a>
+            </div>
+          </article>
+        );
+      })}
+    </div>
+  </div>
+</section>

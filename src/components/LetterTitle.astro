@@ -1,0 +1,20 @@
+---
+/** Page title whose letters settle into place from staggered heights on load. */
+interface Props {
+  text: string;
+  class?: string;
+}
+
+const { text, class: className = '' } = Astro.props;
+// Fixed, varied drop distances so every build looks the same.
+const drops = ['0.15em', '0.42em', '0.28em', '0.55em', '0.2em', '0.48em', '0.33em'];
+const letters = [...text];
+---
+
+<h1 class:list={['t-display letter-drop', className]} aria-label={text}>
+  {letters.map((ch, i) => (
+    <span class="ch" aria-hidden="true" style={`--i:${i};--dy:${drops[i % drops.length]}`}>
+      {ch === ' ' ? ' ' : ch}
+    </span>
+  ))}
+</h1>

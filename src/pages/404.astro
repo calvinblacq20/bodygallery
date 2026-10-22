@@ -1,0 +1,34 @@
+---
+import LetterTitle from '../components/LetterTitle.astro';
+import Base from '../layouts/Base.astro';
+import { generalBookingUrl } from '../lib/booking';
+import { loadSite } from '../lib/site';
+
+const { settings } = await loadSite();
+---
+
+<Base
+  title="Page not found · Body Gallery"
+  description="This page doesn't exist. See our services or book on WhatsApp."
+  settings={settings}
+>
+  <section class="wrap flex min-h-[70svh] flex-col justify-center pt-32 pb-20">
+    <LetterTitle text="Not found" />
+    <p class="mt-6 max-w-[40ch]">
+      This page has moved or never existed. Here's where you probably meant to go:
+    </p>
+    <div class="mt-8 flex flex-wrap gap-3">
+      <a href="/services" class="btn btn-solid">
+        See services &amp; prices
+      </a>
+      <a
+        href={generalBookingUrl(settings.whatsappE164)}
+        class="btn border border-ink/30 hover:border-ink"
+        data-event="book_whatsapp"
+        data-event-label="404"
+      >
+        Book on WhatsApp
+      </a>
+    </div>
+  </section>
+</Base>

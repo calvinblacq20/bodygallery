@@ -1,0 +1,65 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { serviceBookingUrl } from '../lib/booking';
+import { formatDuration, priceText, splitDisplayName } from '../lib/format';
+import Photo from './Photo.astro';
+
+interface Props {
+  service: CollectionEntry<'services'>;
+  whatsappE164: string;
+}
+
+const { service, whatsappE164 } = Astro.props;
+const s = service.data;
+const { lead, accent } = splitDisplayName(s.name);
+const meta = [s.durationMin ? formatDuration(s.durationMin) : undefined, priceText(s)].filter(
+  Boolean,
+);
+const comingSoon = s.status === 'coming-soon';
+---
+
+<article
+  id={service.id}
+  class="grid scroll-mt-28 gap-6 rounded-lg bg-snow p-5 sm:p-7 md:grid-cols-[1fr_1.05fr_minmax(0,0.85fr)] md:items-stretch md:gap-8"
+  data-reveal
+>
+  <!-- On phones this wrapper dissolves so the order reads title, details, book link, photo. -->
+  <div class="contents md:flex md:flex-col md:justify-between md:gap-6">
+    <h3 class="order-1">
+      {lead && <span class="t-label-sm block">{lead}</span>}
+      <span class="t-accent-sm block">{accent}</span>
+    </h3>
+    {comingSoon ? (
+      <p class="order-3 text-sm text-muted">Back soon. Message us to join the list.</p>
+    ) : (
+      <a
+        href={serviceBookingUrl(whatsappE164, s)}
+        class="link-underline order-3 self-start text-sm"
+        data-event="book_whatsapp"
+        data-event-label={service.id}
+      >
+        {s.consultationRequired ? 'Book a consultation' : 'Book on WhatsApp'}
+      </a>
+    )}
+  </div>
+
+  <div class="order-2 flex flex-col justify-end gap-4 text-sm md:pb-1">
+    <p class="max-w-[42ch]">{s.summary}</p>
+    <p class="flex flex-wrap items-center gap-x-3 gap-y-1 text-muted">
+      {meta.join(' · ')}
+      {s.consultationRequired && (
+        <span class="rounded-full border border-line px-2.5 py-0.5 text-xs text-ink">
+          Consultation first
+        </span>
+      )}
+    </p>
+  </div>
+
+  <Photo
+    src={s.photo?.src}
+    alt={s.photo?.alt ?? s.name}
+    tone="warm"
+    class="order-4 aspect-[4/3] rounded-md md:aspect-auto md:min-h-[200px]"
+    sizes="(min-width: 768px) 30vw, 100vw"
+  />
+</article>

@@ -1,0 +1,531 @@
+---
+import GiantWord from '../components/GiantWord.astro';
+import Icon from '../components/Icon.astro';
+import PackagesSection from '../components/PackagesSection.astro';
+import Photo from '../components/Photo.astro';
+import SectionTitle from '../components/SectionTitle.astro';
+import ServiceCard from '../components/ServiceCard.astro';
+import Base from '../layouts/Base.astro';
+import { generalBookingUrl } from '../lib/booking';
+import { formatLocalPhone, telHref } from '../lib/format';
+import { formatTime } from '../lib/hours';
+import { WEEKDAYS } from '../lib/weekdays';
+import { CATEGORY_TITLES, loadSite } from '../lib/site';
+
+const { settings, services, packages } = await loadSite();
+const bookUrl = generalBookingUrl(settings.whatsappE164);
+const live = services.filter((s) => s.data.status === 'live');
+const spa = live.filter((s) => s.data.category === 'spa');
+const bodyAndBeauty = live.filter((s) => s.data.category !== 'spa');
+const advanced = live.filter((s) => s.data.consultationRequired || s.data.category === 'smile');
+
+const hoursSummary = `Mon–Sat ${formatTime(settings.hours.mon?.open ?? '09:00')}–${formatTime(settings.hours.mon?.close ?? '19:00')} · Sun ${formatTime(settings.hours.sun?.open ?? '12:00')}–${formatTime(settings.hours.sun?.close ?? '18:00')}`;
+const dayNames = {
+  mon: 'Monday',
+  tue: 'Tuesday',
+  wed: 'Wednesday',
+  thu: 'Thursday',
+  fri: 'Friday',
+  sat: 'Saturday',
+  sun: 'Sunday',
+};
+const primaryPhone = settings.phones[0];
+
+const values = [
+  {
+    icon: 'tag',
+    title: 'Honest prices',
+    text: 'Spa prices are on the menu, not hidden in DMs. Advanced treatments start with a consultation, so you know the full plan and cost first.',
+    pos: 'md:left-[18%] md:top-[4%]',
+    parallax: '70px',
+  },
+  {
+    icon: 'calendar',
+    title: 'Never rushed',
+    text: 'Advanced treatments are strictly by appointment, so your room is ready and your time is yours.',
+    pos: 'md:right-[4%] md:top-[30%]',
+    parallax: '40px',
+  },
+  {
+    icon: 'hand',
+    title: 'Your body, your choice',
+    text: 'We talk through your skin, your history and your aftercare before anything starts. You decide what happens next.',
+    pos: 'md:left-[2%] md:top-[56%]',
+    parallax: '90px',
+  },
+  {
+    icon: 'pin',
+    title: 'Close to home',
+    text: 'Just off Nyanyano Road in Kasoa. Skip the Accra traffic and spend the time on yourself.',
+    pos: 'md:right-[22%] md:top-[74%]',
+    parallax: '55px',
+  },
+] as const;
+
+const followTiles = [
+  { tone: 'warm', h: 'h-[34vw] md:h-[15vw]', note: 'Client portrait after facial' },
+  { tone: 'blush', h: 'h-[40vw] md:h-[19vw]', note: 'Massage hands detail' },
+  { tone: 'cream', h: 'h-[36vw] md:h-[16vw]', note: 'Treatment room' },
+  { tone: 'deep', h: 'h-[52vw] md:h-[26vw]', note: 'Hero portrait, glowing skin' },
+  { tone: 'warm', h: 'h-[38vw] md:h-[18vw]', note: 'Ombré brows result' },
+  { tone: 'blush', h: 'h-[42vw] md:h-[20vw]', note: 'Pedicure detail' },
+  { tone: 'cream', h: 'h-[34vw] md:h-[15vw]', note: 'Steam sauna' },
+] as const;
+---
+
+<Base
+  title="Body Gallery · Spa & body treatments in Kasoa"
+  description="Massage, facials, waxing, pedicures, stretch-mark treatment, ombré brows and more in Kasoa. Clear prices, by appointment. Book on WhatsApp."
+  settings={settings}
+  headerTone="light"
+>
+  <!-- Hero -->
+  <section class="relative flex min-h-[100svh] flex-col overflow-hidden text-white">
+    <Photo
+      alt="A Body Gallery client relaxing after a treatment"
+      tone="deep"
+      note="Hero: close-up portrait, warm studio light, calm expression"
+      class="absolute inset-0"
+      eager
+      data-note-pos="mid"
+    />
+    <div class="absolute inset-0 bg-gradient-to-b from-black/30 via-black/10 to-black/35"></div>
+    <div class="wrap relative mt-auto pt-32 pb-[2.5vw]">
+      <div class="mb-6 max-w-[34rem] md:mb-8" data-reveal>
+        <h1 class="t-body-lg">
+          Spa rituals and body treatments in Kasoa. Unhurried, honest, and priced for real life.
+        </h1>
+        <div class="mt-5 flex flex-wrap items-center gap-x-6 gap-y-2">
+          <a
+            href={bookUrl}
+            class="link-underline t-body-lg"
+            data-event="book_whatsapp"
+            data-event-label="hero"
+          >
+            Book on WhatsApp
+          </a>
+          <p
+            class="text-sm text-white/80"
+            data-open-status
+            data-hours={JSON.stringify(settings.hours)}
+            data-closures={JSON.stringify(settings.closures)}
+            data-tz={settings.timezone}
+          >
+            {hoursSummary}
+          </p>
+        </div>
+      </div>
+      <GiantWord text={settings.businessName} />
+    </div>
+  </section>
+
+  <!-- Values: oval portrait with floating cards -->
+  <section class="relative overflow-hidden bg-snow pt-24 pb-24 md:pt-36 md:pb-40">
+    <div class="wrap">
+      <div class="grid gap-8 md:grid-cols-[1fr_1fr]">
+        <div data-reveal>
+          <h2 class="t-label max-w-[14ch]">Calm, careful, personal</h2>
+          <p class="mt-4 max-w-[38ch] text-sm text-muted">
+            Accra-quality care without the Accra traffic. Every treatment starts with a conversation
+            about your body and your goals.
+          </p>
+          <p class="t-accent mt-8 inline-block border-b border-ink/60 pr-16 pb-1">self-care</p>
+        </div>
+      </div>
+
+      <div class="relative mt-12 md:mt-0 md:h-[clamp(760px,92vw,1180px)]">
+        <svg
+          class="pointer-events-none absolute -top-[18%] right-[6%] hidden h-[60%] w-[30%] md:block"
+          viewBox="0 0 200 400"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M190 0 C 210 140, 140 260, 20 395"
+            stroke="currentColor"
+            stroke-width="0.8"
+            pathLength="1"
+            data-draw
+          ></path>
+        </svg>
+
+        <div
+          class="relative mx-auto aspect-[3/4] w-[78%] md:absolute md:top-[2%] md:left-[30%] md:w-[44%]"
+          data-reveal="fade"
+        >
+          <div class="oval h-full w-full">
+            <Photo
+              alt="Portrait of a smiling Body Gallery client"
+              tone="warm"
+              class="h-full w-full"
+              inner="counter-rotate"
+            />
+          </div>
+        </div>
+
+        <ul class="mt-10 grid gap-4 sm:grid-cols-2 md:mt-0 md:block">
+          {values.map((v, i) => (
+            <li
+              class:list={['md:absolute md:w-[clamp(240px,19vw,330px)]', v.pos]}
+              data-parallax
+              style={`--parallax:${v.parallax}`}
+            >
+              <div
+                class="flex flex-col items-center rounded-lg bg-cream px-7 py-8 text-center"
+                data-reveal
+                style={`--reveal-delay:${i * 0.1}s`}
+              >
+                <span class="grid h-14 w-14 place-items-center rounded-full bg-white">
+                  <Icon name={v.icon} size={22} />
+                </span>
+                <h3 class="mt-4 font-medium leading-tight">{v.title}</h3>
+                <p class="mt-3 text-[0.95rem] leading-snug">{v.text}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Explore the menu -->
+  <section class="bg-snow pb-24 md:pb-36">
+    <SectionTitle label="Explore" accent="the menu" class="wrap pb-14 md:pb-20" />
+
+    <div class="grid grid-cols-[minmax(0,1fr)] md:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
+      <Photo
+        alt="Massage in the Body Gallery treatment room"
+        tone="warm"
+        note="Massage in progress, low warm light"
+        class="hidden md:block md:aspect-square"
+        data-reveal="fade"
+      />
+      <div class="wrap min-w-0 self-center md:!max-w-none md:pl-12 md:pr-[5.6vw]" data-carousel>
+        <div class="flex items-end justify-between gap-4">
+          <SectionTitle
+            label={CATEGORY_TITLES.spa.label}
+            accent="Rituals"
+            align="left"
+            size="sm"
+            as="h3"
+          />
+          <div class="flex gap-2">
+            <button
+              type="button"
+              class="icon-btn"
+              data-prev
+              hidden
+              aria-label="Previous spa treatments"
+            >
+              <Icon name="arrow-left" size={18} />
+            </button>
+            <button
+              type="button"
+              class="icon-btn"
+              data-next
+              hidden
+              aria-label="Next spa treatments"
+            >
+              <Icon name="arrow" size={18} />
+            </button>
+          </div>
+        </div>
+        <div
+          class="no-scrollbar -mx-[max(20px,5.6vw)] mt-8 flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-px-[max(20px,5.6vw)] px-[max(20px,5.6vw)] pb-2 md:mx-0 md:scroll-px-0 md:px-0"
+          data-track
+        >
+          {spa.map((s, i) => (
+            <ServiceCard
+              service={s}
+              whatsappE164={settings.whatsappE164}
+              label={CATEGORY_TITLES.spa.card}
+              tint={i % 3 === 2 ? 'blush' : 'cream'}
+            />
+          ))}
+        </div>
+        <p class="mt-6 max-w-[40ch] text-sm text-muted">
+          Prices in Ghana cedis, updated{' '}
+          {new Date(settings.pricesUpdatedAt).toLocaleDateString('en-GB', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+          })}
+          .
+        </p>
+      </div>
+    </div>
+
+    <div class="mt-16 grid grid-cols-[minmax(0,1fr)] md:mt-0 md:grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)]">
+      <div class="wrap min-w-0 self-center md:!max-w-none md:pr-12 md:pl-[5.6vw]" data-carousel>
+        <div class="flex items-end justify-between gap-4">
+          <SectionTitle label="Body & beauty" accent="Treatments" align="left" size="sm" as="h3" />
+          <div class="flex gap-2">
+            <button
+              type="button"
+              class="icon-btn"
+              data-prev
+              hidden
+              aria-label="Previous treatments"
+            >
+              <Icon name="arrow-left" size={18} />
+            </button>
+            <button type="button" class="icon-btn" data-next hidden aria-label="Next treatments">
+              <Icon name="arrow" size={18} />
+            </button>
+          </div>
+        </div>
+        <div
+          class="no-scrollbar -mx-[max(20px,5.6vw)] mt-8 flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-px-[max(20px,5.6vw)] px-[max(20px,5.6vw)] pb-2 md:mx-0 md:scroll-px-0 md:px-0"
+          data-track
+        >
+          {bodyAndBeauty.map((s, i) => (
+            <ServiceCard
+              service={s}
+              whatsappE164={settings.whatsappE164}
+              label={CATEGORY_TITLES[s.data.category].card}
+              tint={i % 2 === 0 ? 'blush' : 'cream'}
+            />
+          ))}
+        </div>
+      </div>
+      <Photo
+        alt="Close-up of freshly shaped ombré brows"
+        tone="blush"
+        note="Ombré brows result, close-up"
+        class="hidden md:block md:aspect-square"
+        data-reveal="fade"
+      />
+    </div>
+  </section>
+
+  <!-- Statement -->
+  <section class="relative overflow-hidden py-24 text-white md:py-36">
+    <Photo
+      alt="Warm close-up of skin in natural light"
+      tone="deep"
+      note="Statement backdrop: warm close-up portrait"
+      class="absolute inset-0"
+      data-zoom-out=""
+    />
+    <div class="absolute inset-0 bg-black/25"></div>
+    <div class="wrap relative">
+      <div class="relative">
+        <h2 class="statement-title" data-reveal>
+          <span class="block">Your body,</span>
+          <span class="block">your choice</span>
+        </h2>
+        <p
+          class="mt-8 max-w-[30ch] text-sm md:absolute md:top-3 md:right-0 md:mt-0"
+          data-reveal
+          style="--reveal-delay:0.15s"
+        >
+          We want everyone who walks in to leave feeling confident, empowered and beautiful in their
+          own skin. That means honest advice, careful hands, and a treatment plan you agree to
+          before we begin.
+        </p>
+      </div>
+
+      <div class="mt-16 grid gap-12 md:mt-28 md:grid-cols-2">
+        <p
+          class="max-w-[16ch] text-[clamp(1.8rem,3.2vw,3.2rem)] leading-[1.05] tracking-[-0.02em]"
+          data-reveal
+        >
+          An hour to yourself, close to home.
+        </p>
+        <div class="md:pt-40" data-reveal>
+          <h3 class="t-label-sm">
+            Made for <span class="t-accent-sm normal-case">real life</span> in Kasoa
+          </h3>
+          <p class="mt-4 max-w-[44ch] text-sm text-white/85">
+            Busy week, long commute, little ones at home? We keep it simple: clear prices,
+            appointments planned around you, and a calm room waiting when you arrive. No trip to
+            Accra required.
+          </p>
+        </div>
+      </div>
+
+      <div class="mt-16 flex flex-wrap items-end justify-between gap-6 md:mt-24" data-reveal>
+        <p class="text-[clamp(1.6rem,2.8vw,2.8rem)] leading-none">
+          <span class="font-serif italic">Beautiful</span> in your own skin.
+        </p>
+        <a href="/services" class="link-underline text-sm">
+          See all services
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Advanced treatments list -->
+  <section class="bg-snow py-24 md:py-36">
+    <div class="wrap grid gap-12 md:grid-cols-[1fr_1fr] md:gap-16">
+      <div>
+        <SectionTitle
+          label="Body & skin"
+          accent="Treatments for confident skin"
+          accentFirst
+          align="left"
+          size="sm"
+        />
+        <p class="mt-5 max-w-[44ch] text-sm text-muted" data-reveal>
+          Stretch marks, tattoo regret, brows you don't want to draw on every morning. Each of these
+          starts with a consultation, so we can check the treatment suits your skin before you
+          commit.
+        </p>
+        <ul class="mt-10 space-y-3">
+          {advanced.map((s, i) => (
+            <li data-reveal style={`--reveal-delay:${i * 0.06}s`}>
+              <a
+                href={`/services#${s.id}`}
+                class="group inline-flex items-center gap-2 text-[1.05rem]"
+              >
+                <span class="link-underline">{s.data.name}</span>
+                <Icon
+                  name="arrow"
+                  size={16}
+                  class="transition-transform duration-500 group-hover:translate-x-1"
+                />
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <Photo
+        alt="Consultation before a skin treatment"
+        tone="cream"
+        note="Consultation: practitioner and client talking, notes on a clipboard"
+        class="aspect-[4/3] rounded-md md:mt-24"
+        data-reveal="fade"
+      />
+    </div>
+  </section>
+
+  <PackagesSection packages={packages} whatsappE164={settings.whatsappE164} />
+
+  <!-- Visit -->
+  <section id="visit" class="scroll-mt-6 bg-paper py-24 md:py-36">
+    <div class="wrap">
+      <SectionTitle label="Visit" accent="the gallery" />
+      <div class="mx-auto mt-14 grid max-w-5xl gap-10 md:grid-cols-2 md:gap-16">
+        <div class="space-y-6" data-reveal>
+          <div>
+            <p class="font-medium">{settings.businessName}</p>
+            <address class="not-italic text-muted">
+              {settings.address.street}
+              <br />
+              {settings.address.locality}, {settings.address.region}
+              <br />
+              Plus Code: {settings.plusCode}
+            </address>
+          </div>
+          <ul class="space-y-2 text-[0.95rem]">
+            {settings.directions.map((step) => (
+              <li>{step}</li>
+            ))}
+          </ul>
+          <div class="flex flex-wrap gap-3">
+            <a
+              href={settings.socials.googleMaps}
+              class="btn btn-solid"
+              rel="noopener"
+              data-event="directions_click"
+            >
+              <Icon name="pin" size={18} /> Open in Google Maps
+            </a>
+            {primaryPhone && (
+              <a
+                href={telHref(primaryPhone.e164)}
+                class="btn border border-ink/30 hover:border-ink"
+                data-event="call_click"
+              >
+                <Icon name="phone" size={18} /> {formatLocalPhone(primaryPhone.e164)}
+              </a>
+            )}
+          </div>
+        </div>
+
+        <div data-reveal style="--reveal-delay:0.12s">
+          <p
+            class="mb-4 inline-block rounded-full bg-snow px-3 py-1 text-sm"
+            data-open-status
+            data-hours={JSON.stringify(settings.hours)}
+            data-closures={JSON.stringify(settings.closures)}
+            data-tz={settings.timezone}
+          >
+            Opening hours
+          </p>
+          <table class="w-full text-[0.95rem]">
+            <caption class="sr-only">Opening hours</caption>
+            <tbody>
+              {WEEKDAYS.map((day) => {
+                const slot = settings.hours[day];
+                return (
+                  <tr class="border-b border-line">
+                    <th scope="row" class="py-2.5 text-left font-normal">
+                      {dayNames[day]}
+                    </th>
+                    <td class="py-2.5 text-right">
+                      {slot ? `${formatTime(slot.open)} – ${formatTime(slot.close)}` : 'Closed'}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+          <p class="mt-4 text-sm text-muted">{settings.bookingPolicy}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Follow -->
+  <section class="overflow-hidden bg-cream py-24 md:py-32">
+    <h2 class="flex flex-col items-center text-center" data-reveal>
+      <span class="t-label">Follow us</span>
+      <a href={settings.socials.tiktok} rel="noopener" class="t-accent hover:text-brand">
+        @bodygallery3
+      </a>
+    </h2>
+    <div class="mt-14 flex items-center justify-center gap-3 md:gap-5" data-drift>
+      {followTiles.map((t) => (
+        <Photo
+          alt=""
+          tone={t.tone}
+          note={t.note}
+          class:list={['w-[30vw] shrink-0 rounded-md md:w-[13vw]', t.h]}
+        />
+      ))}
+    </div>
+  </section>
+</Base>
+
+<style>
+  .oval {
+    border-radius: 50%;
+    overflow: hidden;
+    transform: rotate(-24deg);
+  }
+  .oval :global(.counter-rotate) {
+    transform: rotate(24deg) scale(1.25);
+  }
+  /* "YOUR CHOICE" measures 6.43em in Instrument Sans 500 at -0.04em tracking. */
+  .statement-title {
+    --content: calc(min(100vw, 1720px) - 2 * max(20px, 5.6vw));
+    font-size: calc(var(--content) / 6.6);
+    font-weight: 500;
+    line-height: 0.86;
+    letter-spacing: -0.04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  @media (min-width: 768px) {
+    .statement-title {
+      font-size: calc(var(--content) / 8.25);
+    }
+  }
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+</style>

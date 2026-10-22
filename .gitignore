@@ -1,0 +1,21 @@
+# build output
+dist/
+.astro/
+
+# dependencies
+node_modules/
+
+# environment (none needed in v1; keep the rule so a secret can never be committed)
+.env
+.env.*
+!.env.example
+
+# test output
+test-results/
+playwright-report/
+coverage/
+
+# logs and OS files
+*.log
+.DS_Store
+Thumbs.db

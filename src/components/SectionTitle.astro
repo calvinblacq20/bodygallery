@@ -1,0 +1,45 @@
+---
+interface Props {
+  label: string;
+  accent: string;
+  /** Put the serif italic line above the uppercase label. */
+  accentFirst?: boolean;
+  align?: 'center' | 'left';
+  size?: 'lg' | 'sm';
+  as?: 'h1' | 'h2' | 'h3';
+  class?: string;
+}
+
+const {
+  label,
+  accent,
+  accentFirst = false,
+  align = 'center',
+  size = 'lg',
+  as: Tag = 'h2',
+  class: className = '',
+} = Astro.props;
+const labelClass = size === 'lg' ? 't-label' : 't-label-sm';
+const accentClass = size === 'lg' ? 't-accent' : 't-accent-sm';
+---
+
+<Tag
+  class:list={[
+    'flex flex-col',
+    align === 'center' ? 'items-center text-center' : 'items-start',
+    className,
+  ]}
+  data-reveal
+>
+  {accentFirst ? (
+    <>
+      <span class={accentClass}>{accent}</span>
+      <span class={labelClass}>{label}</span>
+    </>
+  ) : (
+    <>
+      <span class={labelClass}>{label}</span>
+      <span class={accentClass}>{accent}</span>
+    </>
+  )}
+</Tag>
