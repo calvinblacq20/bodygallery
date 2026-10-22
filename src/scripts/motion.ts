@@ -1,5 +1,6 @@
 import Lenis from 'lenis';
 import { formatTime, openStatus, type Closure, type WeeklyHours } from '../lib/hours';
+import { startGlide } from './glide';
 import { startScrollLoop } from './scroll-loop';
 
 const root = document.documentElement;
@@ -72,7 +73,7 @@ document.querySelectorAll<HTMLElement>('[data-carousel]').forEach((root) => {
     prev.disabled = track.scrollLeft <= 2;
     next.disabled = track.scrollLeft + track.clientWidth >= track.scrollWidth - 2;
   };
-  const behavior: ScrollBehavior = motion === 'full' ? 'smooth' : 'auto';
+  const behavior: ScrollBehavior = motion === 'off' ? 'auto' : 'smooth';
   prev.addEventListener('click', () => track.scrollBy({ left: -step(), behavior }));
   next.addEventListener('click', () => track.scrollBy({ left: step(), behavior }));
   track.addEventListener('scroll', sync, { passive: true });
@@ -80,6 +81,9 @@ document.querySelectorAll<HTMLElement>('[data-carousel]').forEach((root) => {
   next.hidden = false;
   sync();
 });
+
+// The home-page carousels glide slowly on their own: an ambient loop, so calm keeps it too.
+if (motion !== 'off') startGlide([...document.querySelectorAll<HTMLElement>('[data-glide]')]);
 
 // Close the mobile menu when an in-page link is chosen.
 document.querySelectorAll<HTMLAnchorElement>('[data-close-menu]').forEach((link) => {

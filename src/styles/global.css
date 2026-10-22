@@ -431,6 +431,12 @@ html.lenis body {
   }
 }
 
+/* Carousels gliding on their own (glide.ts): snapping would pull each slow step back to
+   the nearest card, so it is off while gliding and back on as soon as the visitor touches. */
+[data-track].is-gliding {
+  scroll-snap-type: none;
+}
+
 /* Masked title lines: each line is its own block so it can rise out of its mask. */
 .line,
 .line-in {

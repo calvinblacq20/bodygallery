@@ -195,3 +195,46 @@ test.describe('motion levels (resolved once into <html data-motion>)', () => {
     expect((await heroAfterScroll(page)).translate, 'no lift in calm').toBe('none');
   });
 });
+
+test.describe('home carousels glide slowly on their own', () => {
+  /** How far the Spa carousel scrolls by itself in 1.5s. */
+  const glide = async (page: Page) => {
+    const root = page.locator('[data-glide]').first();
+    await root.scrollIntoViewIfNeeded();
+    const track = root.locator('[data-track]');
+    const before = await track.evaluate((el) => el.scrollLeft);
+    await page.waitForTimeout(1500);
+    return (await track.evaluate((el) => el.scrollLeft)) - before;
+  };
+
+  test('in full motion', async ({ page }) => {
+    await page.goto('/');
+    expect(await glide(page)).toBeGreaterThan(10);
+  });
+
+  test('in calm (reduced motion, iPhone Low Power Mode): an ambient loop', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/');
+    expect(await glide(page)).toBeGreaterThan(10);
+  });
+
+  test('still with ?motion=off, and no copies of the cards', async ({ page }) => {
+    await page.goto('/?motion=off');
+    expect(await glide(page)).toBe(0);
+    expect(await page.locator('[data-glide] [data-track] > [aria-hidden="true"]').count()).toBe(0);
+  });
+
+  test('the looping copies are hidden from screen readers and the keyboard', async ({ page }) => {
+    await page.goto('/');
+    const tracks = page.locator('[data-glide] [data-track]');
+    for (const track of await tracks.all()) {
+      const counts = await track.evaluate((el) => {
+        const cards = [...el.children] as HTMLElement[];
+        const copies = cards.filter((c) => c.getAttribute('aria-hidden') === 'true');
+        return { cards: cards.length, copies: copies.length, inert: copies.every((c) => c.inert) };
+      });
+      expect(counts.copies * 2).toBe(counts.cards);
+      expect(counts.inert).toBe(true);
+    }
+  });
+});

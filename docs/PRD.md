@@ -49,7 +49,7 @@ What she needs to know **before** she messages:
 
 ## 4. Pages & screens
 
-The header is the logo, Menu and a **Book** button. The footer holds the business name, address and phone, hours, socials and legal links. **Book**, **Call** and **WhatsApp** stay on screen everywhere: a bar across the bottom on phones (within thumb reach) and a pill in the bottom-right corner on larger screens. On /book, which is the booking flow itself, only Call and WhatsApp show.
+The header is the logo, Menu and a **Book** button. The footer holds the business name, address and phone, hours, socials and legal links. **Book**, **Call** and **WhatsApp** stay on screen everywhere: a compact pill centred at the bottom on phones (within thumb reach) and a pill in the bottom-right corner on larger screens. On /book, which is the booking flow itself, only Call and WhatsApp show.
 
 | Route                                 | What the visitor does                             | What the system does                                                                                                                                                                                                                                                                          |
 | ------------------------------------- | ------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
