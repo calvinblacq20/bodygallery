@@ -2,7 +2,7 @@
 
 - **Status:** Accepted (22 Oct 2026)
 - **Deciders:** Calvin
-- **Related:** [PRD](../PRD.md) §5, §8, §12 · [Research](../BUSINESS-RESEARCH.md)
+- **Related:** [PRD](../PRD.md) §5, §8, §12 · client research dossier (private)
 
 ## Context
 

@@ -3,7 +3,7 @@
 |                       |                                                                                                          |
 | --------------------- | -------------------------------------------------------------------------------------------------------- |
 | **Status**            | Draft, 22 Oct 2026. Built on the assumptions in §11 because the owner hasn't answered yet                |
-| **Source research**   | [BUSINESS-RESEARCH.md](BUSINESS-RESEARCH.md)                                                             |
+| **Source research**   | Client research dossier, 22 Oct 2026 (kept private, not in this repo)                                    |
 | **Key decision**      | [ADR-0001: Static site with WhatsApp booking](decisions/0001-static-site-whatsapp-booking.md) (Accepted) |
 | **Owner of this doc** | Calvin                                                                                                   |
 
