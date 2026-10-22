@@ -1,0 +1,100 @@
+[
+  {
+    "id": "book-ahead",
+    "topic": "booking",
+    "order": 1,
+    "q": "Do I need to book ahead?",
+    "a": "Advanced treatments (microneedling, fibroblast, laser tattoo removal, ombré brows and lip blush) are strictly by appointment. For spa treatments, booking ahead is best so your room is ready when you arrive."
+  },
+  {
+    "id": "how-to-book",
+    "topic": "booking",
+    "order": 2,
+    "q": "How do I book?",
+    "a": "Tap any Book button on this site. WhatsApp opens with your booking already written, so you just press send and we'll reply to confirm a time. You can also call us; our numbers are at the bottom of every page."
+  },
+  {
+    "id": "change-booking",
+    "topic": "booking",
+    "order": 3,
+    "q": "Can I change or cancel my booking?",
+    "a": "Yes. Message us on WhatsApp as early as you can and we'll find you another time. If you've paid a deposit, we'll confirm how it's handled when you book."
+  },
+  {
+    "id": "running-late",
+    "topic": "booking",
+    "order": 4,
+    "q": "What if I'm running late?",
+    "a": "Send us a quick message. We'll do our best to fit you in, but a late start may mean a shorter treatment so the next client isn't kept waiting."
+  },
+  {
+    "id": "why-consultation",
+    "topic": "treatments",
+    "order": 1,
+    "q": "Why do advanced treatments start with a consultation?",
+    "a": "So we can look at your skin, ask about your health history and check the treatment suits you before anything starts. You'll know the plan, the number of sessions and the full cost up front."
+  },
+  {
+    "id": "how-many-sessions",
+    "topic": "treatments",
+    "order": 2,
+    "q": "How many sessions will I need?",
+    "a": "Massages, facials and other spa treatments are a single visit. Stretch-mark and tattoo treatments usually need a course of sessions, and we'll give you a personal plan at your consultation."
+  },
+  {
+    "id": "combine",
+    "topic": "treatments",
+    "order": 3,
+    "q": "Can I combine treatments?",
+    "a": "Yes. Our packages bundle three treatments for one price, and the Sunday Special lets you pick your own three. You'll find them on the home and services pages."
+  },
+  {
+    "id": "darker-skin",
+    "topic": "safety",
+    "order": 1,
+    "q": "Are your treatments suitable for darker skin?",
+    "a": "Spa treatments suit every skin tone. Some advanced treatments, like plasma (fibroblast) and laser, carry a higher risk of dark marks on deeper skin tones, which is one reason every advanced treatment starts with a consultation and sometimes a patch test."
+  },
+  {
+    "id": "pregnancy",
+    "topic": "safety",
+    "order": 2,
+    "q": "Can I have treatments while pregnant or breastfeeding?",
+    "a": "Some treatments aren't suitable during pregnancy or while breastfeeding. Tell us when you book and we'll suggest options that are."
+  },
+  {
+    "id": "health-info",
+    "topic": "safety",
+    "order": 3,
+    "q": "Why do you ask about my health?",
+    "a": "Some medicines, skin conditions and health conditions change which treatments are safe for you. What you tell us is kept private and only used to look after you."
+  },
+  {
+    "id": "how-to-pay",
+    "topic": "payments",
+    "order": 1,
+    "q": "How do I pay?",
+    "a": "We'll confirm the payment options when you book on WhatsApp."
+  },
+  {
+    "id": "deposit",
+    "topic": "payments",
+    "order": 2,
+    "q": "Do I need to pay a deposit?",
+    "a": "Some advanced treatments need a deposit to secure your appointment. If yours does, we'll tell you the amount and how to pay on WhatsApp before your visit."
+  },
+  {
+    "id": "where",
+    "topic": "visit",
+    "order": 1,
+    "q": "Where are you?",
+    "a": "Just off Nyanyano Road at Monaco Junction in Kasoa, about 1 km from KFC Kasoa. The Visit page has directions and a map."
+  },
+  {
+    "id": "what-to-bring",
+    "topic": "visit",
+    "order": 2,
+    "q": "What should I bring or wear?",
+    "a": "Just yourself, in something comfortable. For brow or lip treatments, come without make-up on that area if you can."
+  }
+]

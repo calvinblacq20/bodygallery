@@ -1,0 +1,48 @@
+---
+import follow1 from '../assets/photos/follow-1.jpg';
+import follow2 from '../assets/photos/follow-2.jpg';
+import follow3 from '../assets/photos/follow-3.jpg';
+import follow4 from '../assets/photos/follow-4.jpg';
+import follow5 from '../assets/photos/follow-5.jpg';
+import follow6 from '../assets/photos/follow-6.jpg';
+import follow7 from '../assets/photos/follow-7.jpg';
+import Photo from './Photo.astro';
+
+interface Props {
+  tiktokUrl: string;
+}
+
+const { tiktokUrl } = Astro.props;
+const handle = `@${new URL(tiktokUrl).pathname.replace(/^\/@?/, '')}`;
+const tiles = [
+  { src: follow1, tone: 'warm', h: 'h-[34vw] md:h-[15vw]', note: 'Client portrait after facial' },
+  { src: follow2, tone: 'blush', h: 'h-[40vw] md:h-[19vw]', note: 'Massage hands detail' },
+  { src: follow3, tone: 'cream', h: 'h-[36vw] md:h-[16vw]', note: 'Treatment room' },
+  { src: follow4, tone: 'deep', h: 'h-[52vw] md:h-[26vw]', note: 'Hero portrait, glowing skin' },
+  { src: follow5, tone: 'warm', h: 'h-[38vw] md:h-[18vw]', note: 'Ombré brows result' },
+  { src: follow6, tone: 'blush', h: 'h-[42vw] md:h-[20vw]', note: 'Pedicure detail' },
+  { src: follow7, tone: 'cream', h: 'h-[34vw] md:h-[15vw]', note: 'Steam sauna' },
+] as const;
+---
+
+<section class="overflow-hidden bg-cream py-24 md:py-32">
+  <h2 class="flex flex-col items-center text-center" data-reveal>
+    <span class="t-label">Follow us</span>
+    <a href={tiktokUrl} rel="noopener" class="t-accent hover:text-brand">
+      {handle}
+    </a>
+  </h2>
+  <div class="mt-14 flex items-center justify-center gap-3 md:gap-5" data-drift>
+    {tiles.map((t) => (
+      <Photo
+        src={t.src}
+        alt=""
+        sizes="(min-width: 768px) 13vw, 30vw"
+        widths={[300, 600]}
+        tone={t.tone}
+        note={t.note}
+        class:list={['w-[30vw] shrink-0 rounded-md md:w-[13vw]', t.h]}
+      />
+    ))}
+  </div>
+</section>

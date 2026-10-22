@@ -1,0 +1,39 @@
+---
+import type { Settings } from '../content/schemas';
+import { formatTime } from '../lib/hours';
+import { WEEKDAYS } from '../lib/weekdays';
+
+interface Props {
+  hours: Settings['hours'];
+}
+
+const { hours } = Astro.props;
+const DAY_NAMES = {
+  mon: 'Monday',
+  tue: 'Tuesday',
+  wed: 'Wednesday',
+  thu: 'Thursday',
+  fri: 'Friday',
+  sat: 'Saturday',
+  sun: 'Sunday',
+};
+---
+
+<table class="w-full text-[0.95rem]">
+  <caption class="sr-only">Opening hours</caption>
+  <tbody>
+    {WEEKDAYS.map((day) => {
+      const slot = hours[day];
+      return (
+        <tr class="border-b border-line">
+          <th scope="row" class="py-2.5 text-left font-normal">
+            {DAY_NAMES[day]}
+          </th>
+          <td class="py-2.5 text-right">
+            {slot ? `${formatTime(slot.open)} – ${formatTime(slot.close)}` : 'Closed'}
+          </td>
+        </tr>
+      );
+    })}
+  </tbody>
+</table>

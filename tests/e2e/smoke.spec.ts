@@ -56,7 +56,17 @@ test('the Sunday special explains its day rule in the message', async ({ page })
 });
 
 test('pages never scroll sideways', async ({ page }) => {
-  for (const path of ['/', '/services']) {
+  for (const path of [
+    '/',
+    '/services',
+    '/services/laser-tattoo-removal',
+    '/about',
+    '/visit',
+    '/faq',
+    '/book',
+    '/privacy',
+    '/terms',
+  ]) {
     await page.goto(path);
     const overflow = await page.evaluate(
       () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
@@ -93,6 +103,8 @@ test.describe('without JavaScript (Opera Mini, data savers)', () => {
 });
 
 test('no detectable accessibility violations', async ({ page }) => {
+  // Check the settled page: mid-fade text would fail contrast for a split second.
+  await page.emulateMedia({ reducedMotion: 'reduce' });
   for (const path of ['/', '/services']) {
     await page.goto(path);
     const results = await new AxeBuilder({ page })

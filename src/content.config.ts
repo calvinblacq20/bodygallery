@@ -1,6 +1,6 @@
 import { defineCollection } from 'astro:content';
 import { file, glob } from 'astro/loaders';
-import { makeServiceSchema, packageSchema, settingsSchema } from './content/schemas';
+import { faqSchema, makeServiceSchema, packageSchema, settingsSchema } from './content/schemas';
 
 const settings = defineCollection({
   loader: file('src/content/settings.json'),
@@ -17,4 +17,9 @@ const packages = defineCollection({
   schema: packageSchema,
 });
 
-export const collections = { settings, services, packages };
+const faqs = defineCollection({
+  loader: file('src/content/faqs.json'),
+  schema: faqSchema,
+});
+
+export const collections = { settings, services, packages, faqs };

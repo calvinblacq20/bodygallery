@@ -26,20 +26,29 @@ const comingSoon = s.status === 'coming-soon';
   <!-- On phones this wrapper dissolves so the order reads title, details, book link, photo. -->
   <div class="contents md:flex md:flex-col md:justify-between md:gap-6">
     <h3 class="order-1">
-      {lead && <span class="t-label-sm block">{lead}</span>}
-      <span class="t-accent-sm block">{accent}</span>
+      <a href={`/services/${service.id}`} class="group">
+        {lead && <span class="t-label-sm block">{lead}</span>}
+        <span class="t-accent-sm block group-hover:underline group-hover:decoration-1 group-hover:underline-offset-4">
+          {accent}
+        </span>
+      </a>
     </h3>
     {comingSoon ? (
       <p class="order-3 text-sm text-muted">Back soon. Message us to join the list.</p>
     ) : (
-      <a
-        href={serviceBookingUrl(whatsappE164, s)}
-        class="link-underline order-3 self-start text-sm"
-        data-event="book_whatsapp"
-        data-event-label={service.id}
-      >
-        {s.consultationRequired ? 'Book a consultation' : 'Book on WhatsApp'}
-      </a>
+      <p class="order-3 flex flex-wrap gap-x-5 gap-y-2 text-sm">
+        <a
+          href={serviceBookingUrl(whatsappE164, s)}
+          class="link-underline"
+          data-event="book_whatsapp"
+          data-event-label={service.id}
+        >
+          {s.consultationRequired ? 'Book a consultation' : 'Book on WhatsApp'}
+        </a>
+        <a href={`/services/${service.id}`} class="link-underline text-muted">
+          Details<span class="sr-only"> about {s.name}</span>
+        </a>
+      </p>
     )}
   </div>
 
@@ -49,7 +58,7 @@ const comingSoon = s.status === 'coming-soon';
       {meta.join(' · ')}
       {s.consultationRequired && (
         <span class="rounded-full border border-line px-2.5 py-0.5 text-xs text-ink">
-          Consultation first
+          By appointment only
         </span>
       )}
     </p>

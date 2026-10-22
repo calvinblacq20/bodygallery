@@ -1,0 +1,270 @@
+---
+import { render } from 'astro:content';
+import Accordion from '../../components/Accordion.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import Icon from '../../components/Icon.astro';
+import Photo from '../../components/Photo.astro';
+import SectionTitle from '../../components/SectionTitle.astro';
+import ServiceCard from '../../components/ServiceCard.astro';
+import Base from '../../layouts/Base.astro';
+import { serviceBookingUrl } from '../../lib/booking';
+import { formatDuration, priceText, splitDisplayName } from '../../lib/format';
+import { CATEGORY_TITLES, loadSite } from '../../lib/site';
+
+export async function getStaticPaths() {
+  const { services } = await loadSite();
+  return services.map((service) => ({ params: { slug: service.id }, props: { service } }));
+}
+
+const { service } = Astro.props;
+const { settings, services, packages } = await loadSite();
+const { Content } = await render(service);
+const s = service.data;
+const category = CATEGORY_TITLES[s.category];
+const { lead, accent } = splitDisplayName(s.name);
+const live = s.status === 'live';
+const bookUrl = serviceBookingUrl(settings.whatsappE164, s);
+const bookLabel = s.consultationRequired ? 'Book a consultation' : 'Book on WhatsApp';
+
+const facts = [
+  {
+    label: 'Time',
+    value: s.durationMin ? formatDuration(s.durationMin) : 'Confirmed when you book',
+  },
+  { label: 'Price', value: priceText(s) },
+  ...(s.sessions ? [{ label: 'Sessions', value: s.sessions }] : []),
+  ...(s.downtime ? [{ label: 'Recovery', value: s.downtime }] : []),
+];
+
+const inPackages = packages.filter((p) =>
+  (p.data.kind === 'fixed' ? p.data.includes : p.data.choose.from).some(
+    (item) => item.service === service.id,
+  ),
+);
+const related = services
+  .filter((x) => x.id !== service.id && x.data.status === 'live')
+  .sort((a, b) => Number(b.data.category === s.category) - Number(a.data.category === s.category))
+  .slice(0, 6);
+---
+
+<Base
+  title={`${s.name} in Kasoa · Body Gallery`}
+  description={`${s.summary} ${priceText(s)}. Book on WhatsApp.`}
+  settings={settings}
+>
+  <section class="wrap pt-28 md:pt-36">
+    <nav aria-label="Breadcrumb" class="text-sm text-muted">
+      <a href="/services" class="hover:text-ink">
+        Services
+      </a>
+      <span aria-hidden="true"> / </span>
+      <a href={`/services#${s.category}`} class="hover:text-ink">
+        {category.label}
+      </a>
+    </nav>
+
+    <div class="mt-6 grid gap-10 md:grid-cols-[1.1fr_0.9fr] md:items-end md:gap-16">
+      <div>
+        <h1 data-reveal>
+          {lead && <span class="t-title block">{lead}</span>}
+          <span class="t-accent block">{accent}</span>
+        </h1>
+        <p class="t-body-lg mt-6 max-w-[36ch]" data-reveal>
+          {s.summary}
+        </p>
+        <p class="mt-5 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-muted" data-reveal>
+          {[s.durationMin ? formatDuration(s.durationMin) : undefined, priceText(s)]
+            .filter(Boolean)
+            .join(' · ')}
+          {s.consultationRequired && (
+            <span class="rounded-full border border-line px-2.5 py-0.5 text-xs text-ink">
+              By appointment only
+            </span>
+          )}
+        </p>
+        {live ? (
+          <div class="mt-8 flex flex-wrap gap-3" data-reveal>
+            <a
+              href={bookUrl}
+              class="btn btn-solid"
+              data-event="book_whatsapp"
+              data-event-label={`detail-${service.id}`}
+            >
+              {bookLabel} <span aria-hidden="true">→</span>
+            </a>
+            <a
+              href={`/book?service=${service.id}`}
+              class="btn border border-ink/30 hover:border-ink"
+            >
+              Pick a day and time
+            </a>
+          </div>
+        ) : (
+          <p class="mt-8 text-muted" data-reveal>
+            Back soon. Message us on WhatsApp to join the list.
+          </p>
+        )}
+      </div>
+      <Photo
+        src={s.photo?.src}
+        alt={s.photo?.alt ?? s.name}
+        tone="warm"
+        class="aspect-[4/5] rounded-md md:aspect-[5/6]"
+        sizes="(min-width: 768px) 40vw, 100vw"
+        widths={[600, 900, 1200]}
+        eager
+      />
+    </div>
+  </section>
+
+  <section class="wrap mt-24 grid gap-8 md:mt-36 md:grid-cols-[0.8fr_1.2fr] md:gap-16">
+    <SectionTitle label="What to" accent="expect" align="left" size="sm" />
+    <div class="prose" data-reveal>
+      <Content />
+    </div>
+  </section>
+
+  <section class="wrap mt-16 md:mt-24">
+    <dl class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      {facts.map((f, i) => (
+        <div class="rounded-lg bg-cream p-6" data-reveal style={`--reveal-delay:${i * 0.08}s`}>
+          <dt class="text-xs tracking-wide text-muted uppercase">{f.label}</dt>
+          <dd class="mt-2 text-[1.05rem] leading-snug">{f.value}</dd>
+        </div>
+      ))}
+    </dl>
+  </section>
+
+  {(s.suits.length > 0 || s.tellUs.length > 0) && (
+    <section class="mt-24 bg-paper py-20 md:mt-32 md:py-28">
+      <SectionTitle label="Is it" accent="right for you?" />
+      <div class="wrap mt-12 grid max-w-5xl gap-4 md:mt-16 md:grid-cols-2">
+        {s.suits.length > 0 && (
+          <div class="rounded-lg bg-snow p-7 md:p-9" data-reveal>
+            <h3 class="font-medium">It may suit you if</h3>
+            <ul class="mt-4 space-y-2.5">
+              {s.suits.map((item) => (
+                <li class="flex gap-3">
+                  <span
+                    aria-hidden="true"
+                    class="mt-[0.55em] h-1.5 w-1.5 shrink-0 rounded-full bg-ink"
+                  />
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+        {s.tellUs.length > 0 && (
+          <div class="rounded-lg bg-snow p-7 md:p-9" data-reveal style="--reveal-delay:0.1s">
+            <h3 class="font-medium">Tell us before booking if</h3>
+            <ul class="mt-4 space-y-2.5">
+              {s.tellUs.map((item) => (
+                <li class="flex gap-3">
+                  <span
+                    aria-hidden="true"
+                    class="mt-[0.55em] h-1.5 w-1.5 shrink-0 rounded-full bg-brand"
+                  />
+                  {item}
+                </li>
+              ))}
+            </ul>
+            <p class="mt-6 text-sm text-muted">
+              {s.consultationRequired
+                ? "Your consultation confirms whether it's right for you."
+                : "If any of these apply, mention it when you book and we'll advise you."}
+            </p>
+          </div>
+        )}
+      </div>
+    </section>
+  )}
+
+  <section class="wrap mt-24 grid gap-12 md:mt-32 md:grid-cols-2 md:gap-16">
+    {s.aftercare.length > 0 && (
+      <div data-reveal>
+        <SectionTitle label="After" accent="your visit" align="left" size="sm" />
+        <ul class="mt-8 space-y-3">
+          {s.aftercare.map((item, i) => (
+            <li class="flex gap-4 border-b border-line pb-3">
+              <span class="w-6 shrink-0 text-sm text-muted">{String(i + 1).padStart(2, '0')}</span>
+              {item}
+            </li>
+          ))}
+        </ul>
+      </div>
+    )}
+    {s.consultationRequired && (
+      <div data-reveal style="--reveal-delay:0.1s">
+        <SectionTitle label="Real" accent="results" align="left" size="sm" />
+        <p class="mt-8 max-w-[44ch] text-muted">
+          Results photos are coming soon. We only share before-and-after pictures with each client's
+          written permission. Ask us on WhatsApp if you'd like to see examples.
+        </p>
+      </div>
+    )}
+  </section>
+
+  {s.faqs.length > 0 && (
+    <section class="wrap mt-24 grid gap-8 md:mt-32 md:grid-cols-[0.8fr_1.2fr] md:gap-16">
+      <SectionTitle label="Your" accent="questions" align="left" size="sm" />
+      <Accordion items={s.faqs} />
+    </section>
+  )}
+
+  {inPackages.length > 0 && (
+    <section class="wrap mt-16" data-reveal>
+      <p class="text-muted">
+        Also included in{' '}
+        {inPackages.map((p, i) => (
+          <>
+            {i > 0 && ' and '}
+            <a href="/#packages" class="link-underline text-ink">
+              {p.data.name}
+            </a>
+          </>
+        ))}
+        .
+      </p>
+    </section>
+  )}
+
+  <section class="mt-24 pb-24 md:mt-32 md:pb-32" data-carousel>
+    <div class="wrap flex items-end justify-between gap-4">
+      <SectionTitle label="You may" accent="also like" align="left" size="sm" />
+      <div class="flex gap-2">
+        <button type="button" class="icon-btn" data-prev hidden aria-label="Previous treatments">
+          <Icon name="arrow-left" size={18} />
+        </button>
+        <button type="button" class="icon-btn" data-next hidden aria-label="Next treatments">
+          <Icon name="arrow" size={18} />
+        </button>
+      </div>
+    </div>
+    <div
+      class="wrap no-scrollbar mt-8 flex snap-x snap-mandatory scroll-px-[max(20px,5.6vw)] gap-4 overflow-x-auto pb-2"
+      data-track
+    >
+      {related.map((r, i) => (
+        <ServiceCard
+          service={r}
+          whatsappE164={settings.whatsappE164}
+          label={CATEGORY_TITLES[r.data.category].card}
+          tint={i % 2 === 0 ? 'cream' : 'blush'}
+        />
+      ))}
+    </div>
+  </section>
+
+  <CtaBand
+    whatsappE164={settings.whatsappE164}
+    bookUrl={bookUrl}
+    bookLabel={bookLabel}
+    helperUrl={`/book?service=${service.id}`}
+    text={
+      s.consultationRequired
+        ? "Start with a consultation. We'll check it suits your skin and agree the plan and cost first."
+        : "Send us a message and we'll find you a time."
+    }
+  />
+</Base>

@@ -1,0 +1,226 @@
+---
+import bookBand from '../assets/photos/swedish-massage.jpg';
+import LetterTitle from '../components/LetterTitle.astro';
+import Photo from '../components/Photo.astro';
+import SectionTitle from '../components/SectionTitle.astro';
+import Base from '../layouts/Base.astro';
+import { SERVICE_CATEGORIES } from '../content/schemas';
+import { generalBookingUrl } from '../lib/booking';
+import { formatDuration, formatGHS, formatLocalPhone, priceText, telHref } from '../lib/format';
+import { CATEGORY_TITLES, loadSite } from '../lib/site';
+import { NAME_MAX_LENGTH, NOTE_MAX_LENGTH } from '../lib/whatsapp';
+
+const { settings, services, packages } = await loadSite();
+const live = services.filter((s) => s.data.status === 'live');
+const groups = SERVICE_CATEGORIES.map((category) => ({
+  label: CATEGORY_TITLES[category].label,
+  items: live.filter((s) => s.data.category === category),
+})).filter((g) => g.items.length > 0);
+
+const serviceDetail = (s: (typeof live)[number]['data']) =>
+  [
+    s.durationMin ? formatDuration(s.durationMin) : undefined,
+    s.priceGHS !== undefined ? priceText(s) : undefined,
+  ]
+    .filter(Boolean)
+    .join(' - ');
+---
+
+<Base
+  title="Book · Body Gallery Kasoa"
+  description="Pick a treatment, a day and a time. WhatsApp opens with your booking written out, ready to send to Body Gallery in Kasoa."
+  settings={settings}
+>
+  <section class="wrap pt-32 md:pt-40">
+    <LetterTitle text="Book" />
+    <p class="mt-4 max-w-[42ch] text-sm" data-reveal>
+      Pick a treatment, a day and a time. WhatsApp opens with your booking written out, ready to
+      send, and we'll reply to confirm.
+    </p>
+  </section>
+
+  <div class="wrap mt-12 md:mt-16">
+    <Photo
+      src={bookBand}
+      alt="Woman smiling with her eyes closed during a full-body massage"
+      position="50% 45%"
+      class="aspect-[4/3] md:aspect-[16/6]"
+      widths={[800, 1200]}
+      eager
+      data-reveal="fade"
+    />
+  </div>
+
+  <section class="mt-20 bg-paper py-20 md:mt-28 md:py-28">
+    <SectionTitle label="Make an" accent="appointment" />
+
+    <div class="wrap mt-12 max-w-xl md:mt-16">
+      <div class="nojs-only space-y-5 rounded-lg bg-snow p-7 text-center">
+        <p>Message us on WhatsApp with the treatment and the day you'd like, or give us a call.</p>
+        <a href={generalBookingUrl(settings.whatsappE164)} class="btn btn-solid">
+          Book on WhatsApp <span aria-hidden="true">→</span>
+        </a>
+        <p class="text-sm">
+          {settings.phones.map((p, i) => (
+            <>
+              {i > 0 && ' or '}
+              <a href={telHref(p.e164)} class="link-underline">
+                {formatLocalPhone(p.e164)}
+              </a>
+            </>
+          ))}
+        </p>
+      </div>
+
+      <form
+        id="booking"
+        class="space-y-8"
+        novalidate
+        hidden
+        data-whatsapp={settings.whatsappE164}
+        data-hours={JSON.stringify(settings.hours)}
+        data-closures={JSON.stringify(settings.closures)}
+        data-tz={settings.timezone}
+      >
+        <div>
+          <label for="bk-treatment" class="field-label">
+            Treatment
+          </label>
+          <select
+            id="bk-treatment"
+            name="treatment"
+            class="field"
+            aria-describedby="bk-treatment-error"
+            required
+          >
+            <option value="">Choose a treatment</option>
+            {groups.map((g) => (
+              <optgroup label={g.label}>
+                {g.items.map((s) => (
+                  <option
+                    value={`service:${s.id}`}
+                    data-kind="service"
+                    data-name={s.data.name}
+                    data-detail={serviceDetail(s.data)}
+                    data-consultation={String(s.data.consultationRequired)}
+                  >
+                    {s.data.name} · {priceText(s.data)}
+                  </option>
+                ))}
+              </optgroup>
+            ))}
+            <optgroup label="Packages">
+              {packages.map((p) => (
+                <option
+                  value={`package:${p.id}`}
+                  data-kind="package"
+                  data-name={p.data.name}
+                  data-price={formatGHS(p.data.priceGHS)}
+                  data-items={JSON.stringify(
+                    (p.data.kind === 'fixed' ? p.data.includes : p.data.choose.from).map(
+                      (i) => i.label,
+                    ),
+                  )}
+                  data-choose={p.data.kind === 'choose' ? String(p.data.choose.count) : ''}
+                  data-days={JSON.stringify(p.data.availableDays ?? [])}
+                  data-notes={p.data.notes ?? ''}
+                >
+                  {p.data.name} · {formatGHS(p.data.priceGHS)}
+                </option>
+              ))}
+            </optgroup>
+          </select>
+          <p id="bk-treatment-error" class="field-error" hidden></p>
+        </div>
+
+        <fieldset id="bk-choose" hidden aria-describedby="bk-choose-error">
+          <legend class="field-label">
+            Choose <span data-choose-count>3</span>
+          </legend>
+          <div class="flex flex-wrap gap-2" data-choose-options></div>
+          <p id="bk-choose-error" class="field-error" hidden></p>
+        </fieldset>
+
+        <fieldset aria-describedby="bk-day-hint bk-day-error">
+          <legend class="field-label">Day</legend>
+          <div class="no-scrollbar -mx-1 flex gap-2 overflow-x-auto px-1 py-1" id="bk-days"></div>
+          <p id="bk-day-hint" class="field-hint" data-days-hint></p>
+          <p id="bk-day-error" class="field-error" hidden></p>
+        </fieldset>
+
+        <fieldset aria-describedby="bk-time-error">
+          <legend class="field-label">Time</legend>
+          <div class="flex flex-wrap gap-2" id="bk-times"></div>
+          <p id="bk-time-error" class="field-error" hidden></p>
+        </fieldset>
+
+        <div>
+          <label for="bk-name" class="field-label">
+            Your name
+          </label>
+          <input
+            id="bk-name"
+            name="name"
+            class="field"
+            autocomplete="given-name"
+            maxlength={NAME_MAX_LENGTH}
+            aria-describedby="bk-name-error"
+            required
+          />
+          <p id="bk-name-error" class="field-error" hidden></p>
+        </div>
+
+        <div>
+          <label for="bk-note" class="field-label">
+            Anything we should know? <span class="font-normal text-muted">(optional)</span>
+          </label>
+          <textarea
+            id="bk-note"
+            name="note"
+            rows="3"
+            class="field"
+            maxlength={NOTE_MAX_LENGTH}
+            aria-describedby="bk-note-hint"
+          ></textarea>
+          <p id="bk-note-hint" class="field-hint">
+            Please don't share medical details here. We'll ask at your consultation.
+          </p>
+        </div>
+
+        <div class="rounded-lg bg-snow p-5">
+          <p class="text-xs tracking-wide text-muted uppercase">Your message</p>
+          <p class="mt-2 text-[0.95rem] whitespace-pre-line" data-preview aria-live="polite"></p>
+        </div>
+
+        <div class="space-y-4">
+          <button
+            type="submit"
+            class="btn btn-solid w-full justify-center"
+            data-event="book_whatsapp"
+            data-event-label="helper"
+          >
+            Open WhatsApp <span aria-hidden="true">→</span>
+          </button>
+          <p class="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm">
+            <button type="button" class="link-underline" data-copy>
+              Copy message
+            </button>
+            <span class="text-muted" data-copy-status aria-live="polite"></span>
+            <span>
+              Prefer to call?{' '}
+              {settings.phones[0] && (
+                <a href={telHref(settings.phones[0].e164)} class="link-underline">
+                  {formatLocalPhone(settings.phones[0].e164)}
+                </a>
+              )}
+            </span>
+          </p>
+        </div>
+      </form>
+    </div>
+  </section>
+</Base>
+
+<script>
+  import '../scripts/book';
+</script>

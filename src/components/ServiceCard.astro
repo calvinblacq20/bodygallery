@@ -24,10 +24,17 @@ const s = service.data;
   ]}
 >
   <div class="flex items-center justify-between">
-    <span class="rounded-full bg-white px-3 py-1 text-xs">{label}</span>
+    <span
+      class:list={[
+        'rounded-full px-3 py-1 text-xs',
+        s.consultationRequired ? 'bg-ink text-snow' : 'bg-white',
+      ]}
+    >
+      {s.consultationRequired ? 'By appointment only' : label}
+    </span>
     <a
       href={serviceBookingUrl(whatsappE164, s)}
-      class="grid h-11 w-11 place-items-center rounded-full bg-white transition-colors hover:bg-ink hover:text-snow"
+      class="relative z-10 grid h-11 w-11 place-items-center rounded-full bg-white transition-colors hover:bg-ink hover:text-snow"
       aria-label={`Book ${s.name} on WhatsApp`}
       data-event="book_whatsapp"
       data-event-label={service.id}
@@ -44,7 +51,14 @@ const s = service.data;
     widths={[400, 700]}
   />
   <div class="mt-auto flex items-end justify-between gap-3 text-sm">
-    <h3 class="font-medium leading-tight">{s.name}</h3>
+    <h3 class="font-medium leading-tight">
+      <a
+        href={`/services/${service.id}`}
+        class="before:absolute before:inset-0 before:content-['']"
+      >
+        {s.name}
+      </a>
+    </h3>
     <p class="shrink-0 text-right">{priceText(s)}</p>
   </div>
 </article>

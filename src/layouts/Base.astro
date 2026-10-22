@@ -35,7 +35,8 @@ const bookUrl = generalBookingUrl(settings.whatsappE164);
     <link rel="canonical" href={canonical} />
     {PRELAUNCH && <meta name="robots" content="noindex, nofollow" />}
     <meta name="theme-color" content="#fcfcfb" />
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-48.png" type="image/png" sizes="48x48" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
@@ -49,7 +50,7 @@ const bookUrl = generalBookingUrl(settings.whatsappE164);
     >
       Skip to content
     </a>
-    <Header tone={headerTone} bookUrl={bookUrl} />
+    <Header tone={headerTone} />
     <main id="main">
       <slot />
     </main>

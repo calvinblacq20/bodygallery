@@ -1,0 +1,165 @@
+---
+import type { ImageMetadata } from 'astro';
+import type { CollectionEntry } from 'astro:content';
+import consultationPhoto from '../assets/photos/consultation.jpg';
+import { serviceBookingUrl } from '../lib/booking';
+import { formatDuration, priceText } from '../lib/format';
+import Icon from './Icon.astro';
+import Photo from './Photo.astro';
+import SectionTitle from './SectionTitle.astro';
+
+interface Props {
+  services: CollectionEntry<'services'>[];
+  whatsappE164: string;
+}
+
+const { services, whatsappE164 } = Astro.props;
+const byId = new Map(services.map((s) => [s.id, s]));
+
+interface Group {
+  id: string;
+  label: string;
+  accent: string;
+  text: string;
+  items: string[];
+  photo?: { src: ImageMetadata; alt: string };
+  /** Which item's photo to use when no group photo is given. */
+  photoFrom?: string;
+  position?: string;
+}
+
+const GROUPS: Group[] = [
+  {
+    id: 'stretch-marks',
+    label: 'Stretch-mark',
+    accent: 'treatment',
+    text: 'Two ways to soften the look of stretch marks: microneedling and fibroblast (plasma). Both start with a consultation to check which one suits your skin.',
+    items: ['stretch-mark-microneedling', 'fibroblast-stretch-marks'],
+    photo: { src: consultationPhoto, alt: "Practitioner in a white coat treating a client's skin" },
+    position: '50% 55%',
+  },
+  {
+    id: 'laser',
+    label: 'Laser tattoo',
+    accent: 'removal',
+    text: 'Fade an unwanted tattoo gradually over a planned course of sessions, with an honest view of what to expect at your consultation.',
+    items: ['laser-tattoo-removal'],
+  },
+  {
+    id: 'waxing',
+    label: 'Body',
+    accent: 'waxing',
+    text: 'Clean, smooth hair removal for underarms, legs, bikini area and face. It lasts longer than shaving.',
+    items: ['waxing'],
+  },
+  {
+    id: 'heat',
+    label: 'Sauna &',
+    accent: 'hammam',
+    text: 'Warm, private steam to relax your muscles, or a traditional-style hammam cleanse for soft skin and a quiet mind.',
+    items: ['steam-sauna', 'hammam'],
+    photoFrom: 'hammam',
+  },
+  {
+    id: 'scrub',
+    label: 'Body',
+    accent: 'scrub',
+    text: 'A full-body exfoliation that buffs away dry, dull skin and leaves you smooth. Lovely after a steam.',
+    items: ['body-scrub'],
+  },
+  {
+    id: 'smile',
+    label: 'Teeth',
+    accent: 'whitening',
+    text: 'A cosmetic whitening session for a brighter smile, on its own or as part of Package 2.',
+    items: ['teeth-whitening'],
+  },
+  {
+    id: 'brows-lips',
+    label: 'Brows &',
+    accent: 'lips',
+    text: 'Soft ombré brows and lip blush: semi-permanent colour that saves you time every morning. We map the shape and choose the shade with you first.',
+    items: ['ombre-brows', 'lip-blush'],
+  },
+];
+
+const groups = GROUPS.map((g) => {
+  const items = g.items
+    .map((id) => byId.get(id))
+    .filter((s): s is CollectionEntry<'services'> => !!s && s.data.status === 'live');
+  const source = byId.get(g.photoFrom ?? g.items[0] ?? '');
+  const photo =
+    g.photo ??
+    (source?.data.photo ? { src: source.data.photo.src, alt: source.data.photo.alt } : undefined);
+  return { ...g, items, photo, appointmentOnly: items.some((s) => s.data.consultationRequired) };
+}).filter((g) => g.items.length > 0);
+---
+
+<section id="treatments" class="scroll-mt-6 bg-snow py-24 md:py-36">
+  <SectionTitle label="Signature" accent="treatments" />
+  <p class="wrap mt-6 max-w-[52ch] text-center text-muted" data-reveal>
+    Everything from a Sunday steam to stretch-mark treatment. Treatments marked
+    <strong class="font-medium text-ink">by appointment only</strong> start with a consultation.
+  </p>
+
+  <div class="wrap mt-16 space-y-20 md:mt-24 md:space-y-32">
+    {groups.map((g, i) => (
+      <article id={g.id} class="grid scroll-mt-10 items-center gap-8 md:grid-cols-2 md:gap-16">
+        <Photo
+          src={g.photo?.src}
+          alt={g.photo?.alt ?? ''}
+          position={g.position}
+          tone="warm"
+          class:list={['aspect-[4/5] rounded-md md:aspect-[5/6]', i % 2 === 1 && 'md:order-2']}
+          sizes="(min-width: 768px) 45vw, 100vw"
+          widths={[500, 800, 1200]}
+          data-reveal="fade"
+        />
+        <div data-reveal>
+          <p class="flex flex-wrap gap-2 text-xs">
+            <span class="rounded-full border border-line px-3 py-1 text-muted">
+              {String(i + 1).padStart(2, '0')}
+            </span>
+            {g.appointmentOnly && (
+              <span class="rounded-full bg-ink px-3 py-1 text-snow">By appointment only</span>
+            )}
+          </p>
+          <h3 class="mt-5">
+            <span class="t-label block">{g.label}</span>
+            <span class="t-accent block">{g.accent}</span>
+          </h3>
+          <p class="mt-5 max-w-[46ch] text-[1.05rem] leading-relaxed">{g.text}</p>
+
+          <ul class="mt-8 border-t border-line">
+            {g.items.map((s) => (
+              <li class="flex items-center justify-between gap-4 border-b border-line py-4">
+                <a href={`/services/${s.id}`} class="group min-w-0">
+                  <span class="block font-medium group-hover:underline group-hover:underline-offset-4">
+                    {s.data.name}
+                  </span>
+                  <span class="block text-sm text-muted">
+                    {[
+                      s.data.durationMin ? formatDuration(s.data.durationMin) : undefined,
+                      priceText(s.data),
+                    ]
+                      .filter(Boolean)
+                      .join(' · ')}
+                  </span>
+                </a>
+                <a
+                  href={serviceBookingUrl(whatsappE164, s.data)}
+                  class="icon-btn shrink-0"
+                  aria-label={`${s.data.consultationRequired ? 'Book a consultation for' : 'Book'} ${s.data.name} on WhatsApp`}
+                  data-event="book_whatsapp"
+                  data-event-label={`showcase-${s.id}`}
+                >
+                  <Icon name="arrow-up-right" size={18} />
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </article>
+    ))}
+  </div>
+</section>

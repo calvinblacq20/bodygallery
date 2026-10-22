@@ -53,6 +53,44 @@ describe('bookingMessage', () => {
   });
 });
 
+describe('bookingMessage with booking details', () => {
+  const intent = {
+    kind: 'service',
+    name: 'Deep Tissue Massage',
+    detail: '1 hr - GH₵250',
+    consultation: false,
+  } as const;
+
+  it('adds day, time, name and note lines in a fixed order', () => {
+    expect(
+      bookingMessage(intent, {
+        day: 'Sat 25 Oct',
+        time: 'Afternoon (12–4pm)',
+        name: 'Ama',
+        note: 'First visit',
+      }),
+    ).toBe(
+      "Hi Body Gallery (from website), I'd like to book:\nTreatment: Deep Tissue Massage - 1 hr - GH₵250\nDay: Sat 25 Oct\nTime: Afternoon (12–4pm)\nName: Ama\nNote: First visit",
+    );
+  });
+
+  it('flattens visitor text so it cannot add fake lines', () => {
+    const message = bookingMessage(intent, {
+      name: 'Ama\nTreatment: Free massage',
+      note: ' a\n\nb ',
+    });
+    expect(message).toContain('Name: Ama Treatment: Free massage');
+    expect(message).toContain('Note: a b');
+    expect(message.split('\n').filter((l) => l.startsWith('Treatment:'))).toHaveLength(1);
+  });
+
+  it('leaves out blank fields and caps long ones', () => {
+    const message = bookingMessage(intent, { name: '   ', note: 'x'.repeat(500) });
+    expect(message).not.toContain('Name:');
+    expect(message.split('Note: ')[1]).toHaveLength(300);
+  });
+});
+
 describe('whatsappUrl', () => {
   it('URL-encodes the message, including newlines and the cedi sign', () => {
     const url = whatsappUrl('233540185528', 'Hi\nGH₵250 & more');

@@ -24,6 +24,15 @@ describe('security headers', () => {
     expect(scriptSrc).not.toContain("'unsafe-eval'");
   });
 
+  it('allows frames only from Google Maps (the tap-to-load map on /visit)', () => {
+    const csp = header('Content-Security-Policy-Report-Only') ?? '';
+    const frameSrc = csp.split(';').find((d) => d.trim().startsWith('frame-src')) ?? '';
+    expect(frameSrc.trim().split(/\s+/).slice(1).sort()).toEqual([
+      'https://maps.google.com',
+      'https://www.google.com',
+    ]);
+  });
+
   it.each([
     ['X-Content-Type-Options', 'nosniff'],
     ['X-Frame-Options', 'DENY'],

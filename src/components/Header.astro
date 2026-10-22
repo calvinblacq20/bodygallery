@@ -1,17 +1,21 @@
 ---
+import Logo from './Logo.astro';
+
 interface Props {
   /** "light" = white text over a hero photo; "dark" = ink text on a light page. */
   tone?: 'light' | 'dark';
-  bookUrl: string;
 }
 
-const { tone = 'dark', bookUrl } = Astro.props;
-const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+const { tone = 'dark' } = Astro.props;
+const path = Astro.url.pathname.replace(/\/$/, '').replace(/\.html$/, '') || '/';
+const isCurrent = (href: string) =>
+  href === path || (href === '/services' && path.startsWith('/services/'));
 const links = [
   { href: '/', label: 'Home' },
   { href: '/services', label: 'Services' },
   { href: '/#packages', label: 'Packages' },
-  { href: '/#visit', label: 'Visit' },
+  { href: '/about', label: 'About' },
+  { href: '/visit', label: 'Visit' },
 ];
 ---
 
@@ -20,14 +24,19 @@ const links = [
 >
   <div class="wrap flex h-20 items-center justify-between md:h-28">
     <div class="flex items-center gap-[clamp(2rem,9vw,11rem)]">
-      <a href="/" class="logo" aria-label="Body Gallery home">
-        BG
+      <a href="/" class="block shrink-0" aria-label="Body Gallery home">
+        <Logo
+          tone={tone === 'light' ? 'light' : 'dark'}
+          width={210}
+          class="h-9 w-auto md:h-12"
+          eager
+        />
       </a>
       <nav aria-label="Main" class="hidden md:block">
         <ul class="flex gap-6 text-[1.05rem]">
           {links.map(({ href, label }) => (
             <li>
-              <a href={href} class="nav-link" aria-current={href === path ? 'page' : undefined}>
+              <a href={href} class="nav-link" aria-current={isCurrent(href) ? 'page' : undefined}>
                 {label}
               </a>
             </li>
@@ -37,10 +46,8 @@ const links = [
     </div>
 
     <a
-      href={bookUrl}
+      href="/book"
       class:list={['btn hidden md:inline-flex', tone === 'light' ? 'btn-ghost-light' : 'btn-solid']}
-      data-event="book_whatsapp"
-      data-event-label="header"
     >
       Book now <span aria-hidden="true">→</span>
     </a>
@@ -60,8 +67,8 @@ const links = [
 
 <div id="mobile-menu" popover class="mobile-menu text-ink">
   <div class="wrap flex h-20 items-center justify-between">
-    <a href="/" class="logo" aria-label="Body Gallery home">
-      BG
+    <a href="/" class="block shrink-0" aria-label="Body Gallery home">
+      <Logo width={170} class="h-9 w-auto" />
     </a>
     <button
       type="button"
@@ -83,32 +90,20 @@ const links = [
             href={href}
             class="block py-2"
             data-close-menu
-            aria-current={href === path ? 'page' : undefined}
+            aria-current={isCurrent(href) ? 'page' : undefined}
           >
             {label}
           </a>
         </li>
       ))}
     </ul>
-    <a
-      href={bookUrl}
-      class="btn btn-solid mt-8"
-      data-event="book_whatsapp"
-      data-event-label="mobile-menu"
-    >
+    <a href="/book" class="btn btn-solid mt-8">
       Book now <span aria-hidden="true">→</span>
     </a>
   </nav>
 </div>
 
 <style>
-  .logo {
-    font-weight: 600;
-    font-size: 2.1rem;
-    letter-spacing: -0.06em;
-    line-height: 1;
-    font-stretch: 100%;
-  }
   .nav-link {
     position: relative;
     padding-block: 0.25rem;

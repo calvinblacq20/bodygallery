@@ -1,0 +1,44 @@
+---
+import { Image } from 'astro:assets';
+import horizontal from '../assets/brand/logo-horizontal.png';
+import horizontalWhite from '../assets/brand/logo-horizontal-white.png';
+import stacked from '../assets/brand/logo-stacked.png';
+import stackedWhite from '../assets/brand/logo-stacked-white.png';
+
+interface Props {
+  /** "horizontal": figure beside the name (header). "stacked": the full logo with tagline. */
+  layout?: 'horizontal' | 'stacked';
+  /** "dark" = burgundy logo for light backgrounds; "light" = white logo for dark backgrounds. */
+  tone?: 'dark' | 'light';
+  /** Displayed width in CSS pixels; height follows the logo's proportions. */
+  width: number;
+  class?: string;
+  eager?: boolean;
+}
+
+const {
+  layout = 'horizontal',
+  tone = 'dark',
+  width,
+  class: className,
+  eager = false,
+} = Astro.props;
+const src =
+  layout === 'horizontal'
+    ? tone === 'light'
+      ? horizontalWhite
+      : horizontal
+    : tone === 'light'
+      ? stackedWhite
+      : stacked;
+---
+
+<Image
+  src={src}
+  alt="Body Gallery"
+  width={width}
+  densities={[1, 2]}
+  format="webp"
+  loading={eager ? 'eager' : 'lazy'}
+  class={className}
+/>

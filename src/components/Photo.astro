@@ -16,7 +16,7 @@ interface Props {
   /** Generated widths; keep them close to the largest size the slot is shown at. */
   widths?: number[];
   /** CSS object-position, to keep the subject in frame when the slot crops the photo. */
-  position?: string;
+  position?: string | undefined;
   inner?: string;
   style?: string;
   [key: `data-${string}`]: string | undefined;

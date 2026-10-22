@@ -1,28 +1,22 @@
 ---
+import FollowStrip from '../components/FollowStrip.astro';
 import GiantWord from '../components/GiantWord.astro';
+import HoursTable from '../components/HoursTable.astro';
 import Icon from '../components/Icon.astro';
 import PackagesSection from '../components/PackagesSection.astro';
 import Photo from '../components/Photo.astro';
-import consultationPhoto from '../assets/photos/consultation.jpg';
 import exploreBeautyPhoto from '../assets/photos/explore-beauty.jpg';
 import exploreSpaPhoto from '../assets/photos/explore-spa.jpg';
-import follow1 from '../assets/photos/follow-1.jpg';
-import follow2 from '../assets/photos/follow-2.jpg';
-import follow3 from '../assets/photos/follow-3.jpg';
-import follow4 from '../assets/photos/follow-4.jpg';
-import follow5 from '../assets/photos/follow-5.jpg';
-import follow6 from '../assets/photos/follow-6.jpg';
-import follow7 from '../assets/photos/follow-7.jpg';
 import heroPhoto from '../assets/photos/hero.jpg';
 import ovalPhoto from '../assets/photos/oval.jpg';
 import statementPhoto from '../assets/photos/statement.jpg';
 import SectionTitle from '../components/SectionTitle.astro';
 import ServiceCard from '../components/ServiceCard.astro';
+import TreatmentShowcase from '../components/TreatmentShowcase.astro';
 import Base from '../layouts/Base.astro';
 import { generalBookingUrl } from '../lib/booking';
 import { formatLocalPhone, telHref } from '../lib/format';
 import { formatTime } from '../lib/hours';
-import { WEEKDAYS } from '../lib/weekdays';
 import { CATEGORY_TITLES, loadSite } from '../lib/site';
 
 const { settings, services, packages } = await loadSite();
@@ -30,18 +24,8 @@ const bookUrl = generalBookingUrl(settings.whatsappE164);
 const live = services.filter((s) => s.data.status === 'live');
 const spa = live.filter((s) => s.data.category === 'spa');
 const bodyAndBeauty = live.filter((s) => s.data.category !== 'spa');
-const advanced = live.filter((s) => s.data.consultationRequired || s.data.category === 'smile');
 
 const hoursSummary = `Mon–Sat ${formatTime(settings.hours.mon?.open ?? '09:00')}–${formatTime(settings.hours.mon?.close ?? '19:00')} · Sun ${formatTime(settings.hours.sun?.open ?? '12:00')}–${formatTime(settings.hours.sun?.close ?? '18:00')}`;
-const dayNames = {
-  mon: 'Monday',
-  tue: 'Tuesday',
-  wed: 'Wednesday',
-  thu: 'Thursday',
-  fri: 'Friday',
-  sat: 'Saturday',
-  sun: 'Sunday',
-};
 const primaryPhone = settings.phones[0];
 
 const values = [
@@ -73,16 +57,6 @@ const values = [
     pos: 'md:right-[22%] md:top-[74%]',
     parallax: '55px',
   },
-] as const;
-
-const followTiles = [
-  { src: follow1, tone: 'warm', h: 'h-[34vw] md:h-[15vw]', note: 'Client portrait after facial' },
-  { src: follow2, tone: 'blush', h: 'h-[40vw] md:h-[19vw]', note: 'Massage hands detail' },
-  { src: follow3, tone: 'cream', h: 'h-[36vw] md:h-[16vw]', note: 'Treatment room' },
-  { src: follow4, tone: 'deep', h: 'h-[52vw] md:h-[26vw]', note: 'Hero portrait, glowing skin' },
-  { src: follow5, tone: 'warm', h: 'h-[38vw] md:h-[18vw]', note: 'Ombré brows result' },
-  { src: follow6, tone: 'blush', h: 'h-[42vw] md:h-[20vw]', note: 'Pedicure detail' },
-  { src: follow7, tone: 'cream', h: 'h-[34vw] md:h-[15vw]', note: 'Steam sauna' },
 ] as const;
 ---
 
@@ -385,52 +359,7 @@ const followTiles = [
     </div>
   </section>
 
-  <!-- Advanced treatments list -->
-  <section class="bg-snow py-24 md:py-36">
-    <div class="wrap grid gap-12 md:grid-cols-[1fr_1fr] md:gap-16">
-      <div>
-        <SectionTitle
-          label="Body & skin"
-          accent="Treatments for confident skin"
-          accentFirst
-          align="left"
-          size="sm"
-        />
-        <p class="mt-5 max-w-[44ch] text-sm text-muted" data-reveal>
-          Stretch marks, tattoo regret, brows you don't want to draw on every morning. Each of these
-          starts with a consultation, so we can check the treatment suits your skin before you
-          commit.
-        </p>
-        <ul class="mt-10 space-y-3">
-          {advanced.map((s, i) => (
-            <li data-reveal style={`--reveal-delay:${i * 0.06}s`}>
-              <a
-                href={`/services#${s.id}`}
-                class="group inline-flex items-center gap-2 text-[1.05rem]"
-              >
-                <span class="link-underline">{s.data.name}</span>
-                <Icon
-                  name="arrow"
-                  size={16}
-                  class="transition-transform duration-500 group-hover:translate-x-1"
-                />
-              </a>
-            </li>
-          ))}
-        </ul>
-      </div>
-      <Photo
-        src={consultationPhoto}
-        alt="Practitioner in a white coat treating a client's skin"
-        position="50% 55%"
-        sizes="(min-width: 768px) 45vw, 100vw"
-        tone="cream"
-        note="Consultation: practitioner and client talking, notes on a clipboard"
-        class="aspect-[4/5] rounded-md md:mt-12 md:aspect-[5/6]"
-        data-reveal="fade"
-      />
-    </div>
-  </section>
+  <TreatmentShowcase services={services} whatsappE164={settings.whatsappE164} />
 
   <PackagesSection packages={packages} whatsappE164={settings.whatsappE164} />
 
@@ -474,6 +403,9 @@ const followTiles = [
               </a>
             )}
           </div>
+          <a href="/visit" class="link-underline inline-block text-sm">
+            Full directions and map
+          </a>
         </div>
 
         <div data-reveal style="--reveal-delay:0.12s">
@@ -486,52 +418,14 @@ const followTiles = [
           >
             Opening hours
           </p>
-          <table class="w-full text-[0.95rem]">
-            <caption class="sr-only">Opening hours</caption>
-            <tbody>
-              {WEEKDAYS.map((day) => {
-                const slot = settings.hours[day];
-                return (
-                  <tr class="border-b border-line">
-                    <th scope="row" class="py-2.5 text-left font-normal">
-                      {dayNames[day]}
-                    </th>
-                    <td class="py-2.5 text-right">
-                      {slot ? `${formatTime(slot.open)} – ${formatTime(slot.close)}` : 'Closed'}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+          <HoursTable hours={settings.hours} />
           <p class="mt-4 text-sm text-muted">{settings.bookingPolicy}</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Follow -->
-  <section class="overflow-hidden bg-cream py-24 md:py-32">
-    <h2 class="flex flex-col items-center text-center" data-reveal>
-      <span class="t-label">Follow us</span>
-      <a href={settings.socials.tiktok} rel="noopener" class="t-accent hover:text-brand">
-        @bodygallery3
-      </a>
-    </h2>
-    <div class="mt-14 flex items-center justify-center gap-3 md:gap-5" data-drift>
-      {followTiles.map((t) => (
-        <Photo
-          src={t.src}
-          alt=""
-          sizes="(min-width: 768px) 13vw, 30vw"
-          widths={[300, 600]}
-          tone={t.tone}
-          note={t.note}
-          class:list={['w-[30vw] shrink-0 rounded-md md:w-[13vw]', t.h]}
-        />
-      ))}
-    </div>
-  </section>
+  <FollowStrip tiktokUrl={settings.socials.tiktok} />
 </Base>
 
 <style>
@@ -557,11 +451,5 @@ const followTiles = [
     .statement-title {
       font-size: calc(var(--content) / 8.25);
     }
-  }
-  .no-scrollbar {
-    scrollbar-width: none;
-  }
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
   }
 </style>

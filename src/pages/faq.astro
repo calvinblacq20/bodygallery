@@ -1,0 +1,66 @@
+---
+import { getCollection } from 'astro:content';
+import Accordion from '../components/Accordion.astro';
+import CtaBand from '../components/CtaBand.astro';
+import LetterTitle from '../components/LetterTitle.astro';
+import Base from '../layouts/Base.astro';
+import { FAQ_TOPICS } from '../content/schemas';
+import { loadSite } from '../lib/site';
+
+const { settings } = await loadSite();
+const faqs = await getCollection('faqs');
+
+const TOPIC_TITLES = {
+  booking: { label: 'Booking', accent: 'and changes' },
+  treatments: { label: 'Treatments', accent: 'and plans' },
+  safety: { label: 'Safety', accent: 'and your skin' },
+  payments: { label: 'Payments', accent: 'and deposits' },
+  visit: { label: 'Your visit', accent: 'finding us' },
+} as const;
+
+const groups = FAQ_TOPICS.map((topic) => ({
+  topic,
+  ...TOPIC_TITLES[topic],
+  items: faqs
+    .filter((f) => f.data.topic === topic)
+    .sort((a, b) => a.data.order - b.data.order)
+    .map((f) => f.data),
+})).filter((g) => g.items.length > 0);
+---
+
+<Base
+  title="FAQ · Body Gallery Kasoa"
+  description="Answers about booking, deposits, consultations, darker skin, pregnancy and finding Body Gallery in Kasoa."
+  settings={settings}
+>
+  <section class="wrap pt-32 md:pt-40">
+    <LetterTitle text="FAQ" />
+    <p class="mt-4 max-w-[42ch] text-sm" data-reveal>
+      The questions we hear most. Can't find yours? Message us on WhatsApp and we'll answer.
+    </p>
+  </section>
+
+  <div class="wrap mt-16 space-y-16 pb-24 md:mt-24 md:space-y-24 md:pb-32">
+    {groups.map((g) => (
+      <section
+        id={g.topic}
+        class="grid scroll-mt-6 gap-6 md:grid-cols-[0.8fr_1.2fr] md:gap-16"
+        data-reveal
+      >
+        <h2>
+          <span class="t-label-sm block">{g.label}</span>
+          <span class="t-accent-sm block">{g.accent}</span>
+        </h2>
+        <Accordion items={g.items} />
+      </section>
+    ))}
+  </div>
+
+  <CtaBand
+    whatsappE164={settings.whatsappE164}
+    label="Still"
+    accent="wondering?"
+    text="Ask us anything on WhatsApp and we'll reply as soon as we can."
+    bookLabel="Message us on WhatsApp"
+  />
+</Base>

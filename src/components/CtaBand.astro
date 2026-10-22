@@ -1,0 +1,48 @@
+---
+import { generalBookingUrl } from '../lib/booking';
+
+interface Props {
+  whatsappE164: string;
+  label?: string;
+  accent?: string;
+  text?: string;
+  /** Overrides the general WhatsApp link, e.g. with a treatment already filled in. */
+  bookUrl?: string;
+  bookLabel?: string;
+  /** Link for the secondary button; defaults to the booking helper. */
+  helperUrl?: string;
+}
+
+const {
+  whatsappE164,
+  label = 'Ready',
+  accent = 'when you are',
+  text = "Send us a message and we'll find you a time.",
+  bookUrl = generalBookingUrl(whatsappE164),
+  bookLabel = 'Book on WhatsApp',
+  helperUrl = '/book',
+} = Astro.props;
+---
+
+<section class="bg-ink py-20 text-snow md:py-28">
+  <div class="wrap flex flex-col items-center text-center" data-reveal>
+    <h2 class="flex flex-col items-center">
+      <span class="t-label">{label}</span>
+      <span class="t-accent">{accent}</span>
+    </h2>
+    <p class="mt-5 max-w-[40ch] text-white/75">{text}</p>
+    <div class="mt-8 flex flex-wrap justify-center gap-3">
+      <a
+        href={bookUrl}
+        class="btn bg-snow text-ink hover:bg-cream"
+        data-event="book_whatsapp"
+        data-event-label="cta-band"
+      >
+        {bookLabel} <span aria-hidden="true">→</span>
+      </a>
+      <a href={helperUrl} class="btn border border-white/50 hover:border-white">
+        Pick a day and time
+      </a>
+    </div>
+  </div>
+</section>

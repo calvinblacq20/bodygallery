@@ -1,6 +1,18 @@
 export const MESSAGE_MAX_LENGTH = 1000;
+export const NAME_MAX_LENGTH = 60;
+export const NOTE_MAX_LENGTH = 300;
 
 const GREETING = 'Hi Body Gallery (from website)';
+
+/** What the /book helper adds to a message. Visitor text is flattened so it can't fake extra lines. */
+export interface BookingExtras {
+  day?: string | undefined;
+  time?: string | undefined;
+  name?: string | undefined;
+  note?: string | undefined;
+}
+
+const oneLine = (text: string, max: number) => text.replace(/\s+/g, ' ').trim().slice(0, max);
 
 export type BookingIntent =
   | { kind: 'general' }
@@ -11,7 +23,7 @@ export type BookingIntent =
  * Builds the pre-filled WhatsApp text. It only ever uses content values, never query
  * strings, so a crafted link can't put words in a visitor's mouth.
  */
-export function bookingMessage(intent: BookingIntent): string {
+export function bookingMessage(intent: BookingIntent, extras: BookingExtras = {}): string {
   let message: string;
   switch (intent.kind) {
     case 'general':
@@ -31,6 +43,18 @@ export function bookingMessage(intent: BookingIntent): string {
       break;
     }
   }
+  const field = (label: string, value: string | undefined, max: number) => {
+    const clean = value ? oneLine(value, max) : '';
+    return clean ? `${label}: ${clean}` : '';
+  };
+  const lines = [
+    field('Day', extras.day, 40),
+    field('Time', extras.time, 40),
+    field('Name', extras.name, NAME_MAX_LENGTH),
+    field('Note', extras.note, NOTE_MAX_LENGTH),
+  ].filter(Boolean);
+  if (lines.length > 0) message += `\n${lines.join('\n')}`;
+
   if (message.length > MESSAGE_MAX_LENGTH) {
     throw new Error(
       `WhatsApp message is ${message.length} characters; the limit is ${MESSAGE_MAX_LENGTH}`,

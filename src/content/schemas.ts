@@ -55,8 +55,23 @@ export const makeServiceSchema = <TImage extends z.ZodType>(image: () => TImage)
     featured: z.boolean().default(false),
     order: z.number().int(),
     status,
+    // Detail page content. Session counts and downtime come from the owner, never from us.
+    sessions: z.string().max(140).optional(),
+    downtime: z.string().max(140).optional(),
+    suits: z.array(z.string().min(3)).default([]),
+    tellUs: z.array(z.string().min(3)).default([]),
+    aftercare: z.array(z.string().min(3)).default([]),
+    faqs: z.array(z.object({ q: z.string().min(5), a: z.string().min(5) })).default([]),
   });
 export type ServiceData = z.infer<ReturnType<typeof makeServiceSchema>>;
+
+export const FAQ_TOPICS = ['booking', 'treatments', 'safety', 'payments', 'visit'] as const;
+export const faqSchema = z.object({
+  q: z.string().min(5).max(140),
+  a: z.string().min(5).max(600),
+  topic: z.enum(FAQ_TOPICS),
+  order: z.number().int(),
+});
 
 const packageItem = z.object({ service: z.string().min(1), label: z.string().min(1) });
 

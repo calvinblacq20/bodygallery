@@ -1,0 +1,92 @@
+---
+import LetterTitle from '../components/LetterTitle.astro';
+import Base from '../layouts/Base.astro';
+import { formatLocalPhone, telHref } from '../lib/format';
+import { loadSite } from '../lib/site';
+
+const { settings } = await loadSite();
+const phone = settings.phones[0];
+const UPDATED = '22 October 2026';
+---
+
+<Base
+  title="Privacy · Body Gallery Kasoa"
+  description="How Body Gallery handles your personal information, including bookings on WhatsApp, health details and photos, under Ghana's Data Protection Act."
+  settings={settings}
+>
+  <section class="wrap pt-32 pb-24 md:pt-40 md:pb-32">
+    <LetterTitle text="Privacy" />
+    <p class="mt-4 text-sm text-muted">Last updated {UPDATED}</p>
+
+    <div class="prose mt-12 md:mt-16">
+      <p>
+        {settings.businessName} ("we") is a spa and body-care studio at {settings.address.street},
+        {settings.address.locality}, Ghana. This notice explains what personal information we handle
+        through this website and when you book with us, and your rights under Ghana's Data
+        Protection Act, 2012 (Act 843).
+      </p>
+
+      <h2>This website</h2>
+      <p>
+        This website has no forms or accounts, uses no cookies and doesn't track you across other
+        sites. Our hosting provider keeps standard technical logs, such as IP addresses and browser
+        types, to keep the site secure and working. If we add visitor statistics later, they will be
+        cookie-free and won't identify you, and we'll update this page first.
+      </p>
+
+      <h2>Booking on WhatsApp</h2>
+      <p>
+        When you tap a Book button, WhatsApp opens on your phone with a message ready for you to
+        send. Nothing you type on this website is sent to us or stored by the website. If you send
+        the message, WhatsApp (owned by Meta) carries it under its own privacy policy, and we
+        receive your name, phone number and anything you choose to tell us. We use this only to
+        arrange and manage your appointments.
+      </p>
+
+      <h2>Health information</h2>
+      <p>
+        For some treatments we ask about your health, medicines, allergies and skin history so we
+        can treat you safely. This is sensitive information. We only ask for what we need, keep it
+        private, and use it only for your care. We don't share it with anyone unless you ask us to
+        or the law requires it.
+      </p>
+
+      <h2>Photos</h2>
+      <p>
+        We only take or use before-and-after photos with your written consent, and we'll tell you
+        where they will appear, such as this website or our social media. You can withdraw your
+        consent at any time. We'll remove the photo from this website within 48 hours and stop using
+        it from then on.
+      </p>
+
+      <h2>How long we keep information</h2>
+      <p>
+        We keep booking messages and treatment records only for as long as we need them to look
+        after you and meet our legal obligations, and then delete them.
+      </p>
+
+      <h2>Your rights</h2>
+      <p>Under Act 843 you can ask us to:</p>
+      <ul>
+        <li>show you the personal information we hold about you</li>
+        <li>correct anything that's wrong</li>
+        <li>delete your information</li>
+        <li>stop using your information for a particular purpose</li>
+      </ul>
+      <p>
+        To ask, message us on WhatsApp or call{' '}
+        {phone && <a href={telHref(phone.e164)}>{formatLocalPhone(phone.e164)}</a>}. We'll reply as
+        soon as we can.
+      </p>
+
+      <h2>Complaints</h2>
+      <p>
+        If you're unhappy with how we've handled your information, please tell us first so we can
+        put it right. You can also complain to Ghana's Data Protection Commission.
+      </p>
+
+      <h2>Changes to this notice</h2>
+      <p>If anything changes, we'll update this page and the date at the top.</p>
+    </div>
+  </section>
+</Base>

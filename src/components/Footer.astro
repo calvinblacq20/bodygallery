@@ -3,6 +3,7 @@ import type { Settings } from '../content/schemas';
 import { formatLocalPhone, telHref } from '../lib/format';
 import { formatTime } from '../lib/hours';
 import GiantWord from './GiantWord.astro';
+import Logo from './Logo.astro';
 
 interface Props {
   settings: Settings;
@@ -19,6 +20,9 @@ const year = new Date().getFullYear();
 <footer class="bg-ink text-snow">
   <div class="wrap grid gap-12 pt-20 pb-10 md:grid-cols-[1.1fr_1fr_1.2fr] md:pt-24">
     <div class="space-y-6 text-sm">
+      <a href="/" class="inline-block" aria-label="Body Gallery home">
+        <Logo layout="stacked" tone="light" width={170} class="h-auto w-[150px] md:w-[170px]" />
+      </a>
       <div>
         <p class="font-medium">Visit the gallery</p>
         <address class="mt-1 not-italic text-white/70">
@@ -50,27 +54,46 @@ const year = new Date().getFullYear();
     </div>
 
     <nav aria-label="Footer" class="footer-nav grid grid-cols-2 content-start gap-x-8 text-sm">
-      <a href="/" class="hover:text-white/70">
-        Home
-      </a>
-      <a href={settings.socials.tiktok} rel="noopener" class="hover:text-white/70">
-        TikTok
-      </a>
-      <a href="/services" class="hover:text-white/70">
-        Services
-      </a>
-      <a href={settings.socials.instagram} rel="noopener" class="hover:text-white/70">
-        Instagram
-      </a>
-      <a href="/#packages" class="hover:text-white/70">
-        Packages
-      </a>
-      <a href={settings.socials.googleMaps} rel="noopener" class="hover:text-white/70">
-        Google Maps
-      </a>
-      <a href="/#visit" class="hover:text-white/70">
-        Visit
-      </a>
+      <ul>
+        {[
+          ['/', 'Home'],
+          ['/services', 'Services'],
+          ['/#packages', 'Packages'],
+          ['/about', 'About'],
+          ['/visit', 'Visit'],
+          ['/faq', 'FAQ'],
+          ['/book', 'Book'],
+        ].map(([href, label]) => (
+          <li>
+            <a href={href} class="hover:text-white/70">
+              {label}
+            </a>
+          </li>
+        ))}
+      </ul>
+      <ul>
+        {[
+          [settings.socials.tiktok, 'TikTok'],
+          [settings.socials.instagram, 'Instagram'],
+          [settings.socials.googleMaps, 'Google Maps'],
+        ].map(([href, label]) => (
+          <li>
+            <a href={href} rel="noopener" class="hover:text-white/70">
+              {label}
+            </a>
+          </li>
+        ))}
+        <li class="mt-4">
+          <a href="/privacy" class="text-white/70 hover:text-white">
+            Privacy
+          </a>
+        </li>
+        <li>
+          <a href="/terms" class="text-white/70 hover:text-white">
+            Booking terms
+          </a>
+        </li>
+      </ul>
     </nav>
 
     <div class="text-sm">

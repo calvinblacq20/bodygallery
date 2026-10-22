@@ -1,0 +1,152 @@
+---
+import aboutBand from '../assets/photos/packages.jpg';
+import pairLeft from '../assets/photos/explore-beauty.jpg';
+import pairRight from '../assets/photos/steam-sauna.jpg';
+import CtaBand from '../components/CtaBand.astro';
+import FollowStrip from '../components/FollowStrip.astro';
+import Icon from '../components/Icon.astro';
+import LetterTitle from '../components/LetterTitle.astro';
+import Photo from '../components/Photo.astro';
+import SectionTitle from '../components/SectionTitle.astro';
+import Base from '../layouts/Base.astro';
+import { loadSite } from '../lib/site';
+
+const { settings } = await loadSite();
+
+const approach = [
+  {
+    icon: 'calendar',
+    title: 'Consultation first',
+    text: 'Advanced treatments always start with a conversation about your skin, your health and your goals. You agree the plan and the price before anything begins.',
+  },
+  {
+    icon: 'tag',
+    title: 'Honest about results',
+    text: "We tell you what a treatment can and can't do, how many sessions it usually takes and what recovery looks like. No miracle promises.",
+  },
+  {
+    icon: 'hand',
+    title: 'Every skin tone in mind',
+    text: "We plan treatments with deeper skin tones in mind, including a patch test where there's a risk of dark marks.",
+  },
+] as const;
+
+const standards = [
+  {
+    title: 'By appointment',
+    text: 'Advanced treatments are strictly by appointment, so your time is protected and the room is ready for you.',
+  },
+  {
+    title: 'Clear prices',
+    text: 'Spa prices are published on our menu. For advanced treatments you get the full cost at your consultation.',
+  },
+  {
+    title: 'Your consent, always',
+    text: 'You decide what happens to your body. We only use a client photo with their written permission, and remove it if they change their mind.',
+  },
+  {
+    title: 'Private by default',
+    text: 'What you tell us about your health stays between you and us, and is only used to look after you.',
+  },
+] as const;
+---
+
+<Base
+  title="About · Body Gallery Kasoa"
+  description="Body Gallery is a spa and body-care studio in Kasoa. Consultation first, honest about results, with every skin tone in mind."
+  settings={settings}
+>
+  <section class="wrap pt-32 md:pt-40">
+    <LetterTitle text="About us" />
+    <p class="mt-4 max-w-[40ch] text-sm" data-reveal>
+      A spa and body-care studio in Kasoa, built on one idea: your body, your choice.
+    </p>
+  </section>
+
+  <div class="wrap mt-12 md:mt-16">
+    <Photo
+      src={aboutBand}
+      alt="Close-up of a woman's eyes and glowing skin"
+      position="50% 38%"
+      class="aspect-[4/3] md:aspect-[16/6]"
+      widths={[800, 1400, 2000]}
+      eager
+      data-reveal="fade"
+    />
+  </div>
+
+  <section class="wrap mt-20 grid gap-10 md:mt-28 md:grid-cols-2 md:gap-16">
+    <SectionTitle label="Where self-care meets" accent="careful hands" align="left" />
+    <div class="space-y-5 text-[1.05rem] leading-relaxed" data-reveal>
+      <p>
+        Body Gallery is a spa and body-care studio just off Nyanyano Road in Kasoa. We offer
+        massage, facials, waxing, steam and nail care, alongside advanced body and skin treatments
+        such as stretch-mark microneedling, laser tattoo removal and semi-permanent brows and lips.
+      </p>
+      <p>
+        Our vision is simple: everyone who walks in should leave feeling confident, empowered and
+        beautiful in their own skin. We get there with honest advice, careful hands and treatments
+        planned with you.
+      </p>
+    </div>
+  </section>
+
+  <div class="wrap mt-16 grid grid-cols-2 gap-2 md:mt-24">
+    <Photo
+      src={pairLeft}
+      alt="Woman smiling during an eyebrow treatment"
+      position="40% 50%"
+      class="aspect-[4/5] md:aspect-[4/3]"
+      sizes="50vw"
+      data-reveal="fade"
+    />
+    <Photo
+      src={pairRight}
+      alt="Practitioner using a facial steamer on a relaxed client"
+      position="50% 45%"
+      class="aspect-[4/5] md:aspect-[4/3]"
+      sizes="50vw"
+      data-reveal="fade"
+      style="--reveal-delay:0.1s"
+    />
+  </div>
+
+  <section class="mt-24 bg-paper py-20 md:mt-32 md:py-28">
+    <div class="wrap">
+      <SectionTitle label="Our approach" accent="How we work" accentFirst align="left" />
+      <div class="mt-12 grid gap-4 md:mt-16 md:grid-cols-3">
+        {approach.map((a, i) => (
+          <div
+            class="flex flex-col items-center rounded-lg bg-snow px-7 py-9 text-center"
+            data-reveal
+            style={`--reveal-delay:${i * 0.1}s`}
+          >
+            <span class="grid h-14 w-14 place-items-center rounded-full bg-cream">
+              <Icon name={a.icon} size={22} />
+            </span>
+            <h3 class="mt-4 font-medium">{a.title}</h3>
+            <p class="mt-3 text-[0.95rem] leading-snug">{a.text}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap mt-24 md:mt-32">
+    <SectionTitle label="Our" accent="standards" align="left" size="sm" />
+    <dl class="mt-10 grid gap-x-16 md:grid-cols-2">
+      {standards.map((item) => (
+        <div class="grid gap-2 border-b border-line py-6 sm:grid-cols-[12rem_1fr]" data-reveal>
+          <dt class="font-medium">{item.title}</dt>
+          <dd class="text-muted">{item.text}</dd>
+        </div>
+      ))}
+    </dl>
+  </section>
+
+  <div class="mt-24 md:mt-32">
+    <FollowStrip tiktokUrl={settings.socials.tiktok} />
+  </div>
+
+  <CtaBand whatsappE164={settings.whatsappE164} />
+</Base>

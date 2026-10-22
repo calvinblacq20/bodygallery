@@ -2,9 +2,12 @@ import Lenis from 'lenis';
 import { formatTime, openStatus, type Closure, type WeeklyHours } from '../lib/hours';
 
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+// Phones and tablets keep native scrolling: it's smoother on budget devices, and smooth-scroll
+// fights browser-initiated scrolls there (focusing a form field, scrolling a button into view).
+const touchScreen = window.matchMedia('(pointer: coarse)').matches;
 
-// Smooth, weighted scrolling for wheel and trackpad. Touch keeps the phone's native scrolling.
-if (!reduceMotion) {
+// Smooth, weighted scrolling for wheel and trackpad only.
+if (!reduceMotion && !touchScreen) {
   new Lenis({
     autoRaf: true,
     duration: 1.15,

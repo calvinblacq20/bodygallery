@@ -1,0 +1,92 @@
+---
+import LetterTitle from '../components/LetterTitle.astro';
+import Base from '../layouts/Base.astro';
+import { loadSite } from '../lib/site';
+
+const { settings } = await loadSite();
+const UPDATED = '22 October 2026';
+const pricesUpdated = new Date(settings.pricesUpdatedAt).toLocaleDateString('en-GB', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+});
+---
+
+<Base
+  title="Booking terms · Body Gallery Kasoa"
+  description="Body Gallery's booking terms: confirmations, deposits, changes, late arrival, prices, your health and results."
+  settings={settings}
+>
+  <section class="wrap pt-32 pb-24 md:pt-40 md:pb-32">
+    <LetterTitle text="Terms" />
+    <p class="mt-4 text-sm text-muted">Last updated {UPDATED}</p>
+
+    <div class="prose mt-12 md:mt-16">
+      <p>
+        These terms cover bookings and treatments at {settings.businessName},{' '}
+        {settings.address.locality}. By booking with us, you agree to them.
+      </p>
+
+      <h2>Booking</h2>
+      <p>
+        Your booking is confirmed when we reply on WhatsApp with your date and time. Advanced
+        treatments are strictly by appointment.
+      </p>
+
+      <h2>Deposits</h2>
+      <p>
+        Some advanced treatments need a deposit to secure your appointment. We'll tell you the
+        amount and how to pay before your visit, and confirm in writing how the deposit is handled
+        if you change or cancel.
+      </p>
+
+      <h2>Changing or cancelling</h2>
+      <p>
+        If you need to change or cancel, please message us on WhatsApp as early as you can so we can
+        offer the time to someone else.
+      </p>
+
+      <h2>Arriving late</h2>
+      <p>
+        If you're running late, let us know. We'll do our best to fit you in, but your treatment may
+        be shorter so the next client isn't kept waiting.
+      </p>
+
+      <h2>Prices</h2>
+      <p>
+        Prices on this website are in Ghana cedis and were last updated on {pricesUpdated}. We
+        confirm the price of your treatment when you book. Prices for advanced treatments are given
+        at your consultation, before any treatment starts.
+      </p>
+
+      <h2>Your health and suitability</h2>
+      <p>
+        Please tell us about any health conditions, medicines, allergies, pregnancy or recent
+        treatments before your appointment. We may decline or postpone a treatment if it isn't safe
+        or suitable for you.
+      </p>
+
+      <h2>Results</h2>
+      <p>
+        Results vary from person to person. We'll explain what's realistic for you, but we can't
+        guarantee a particular result. Following the aftercare advice we give you helps you get the
+        best result and lowers the risk of side effects.
+      </p>
+
+      <h2>Photos</h2>
+      <p>
+        We only use photos of you with your written consent. See our{' '}
+        <a href="/privacy">privacy notice</a> for how to withdraw it.
+      </p>
+
+      <h2>This website</h2>
+      <p>
+        We work to keep this website accurate, but details can change. If anything on the website
+        differs from what we confirm with you on WhatsApp, what we confirm on WhatsApp applies.
+      </p>
+
+      <h2>Law</h2>
+      <p>These terms are governed by the laws of Ghana.</p>
+    </div>
+  </section>
+</Base>
