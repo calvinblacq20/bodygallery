@@ -1,0 +1,163 @@
+---
+/**
+ * Motion diagnostics, for phones that can't be inspected. Open it on the handset and read the
+ * numbers: what the device asked for, what the page resolved, whether frames and CSS
+ * animations actually advance. Not linked from the site and never indexed.
+ */
+import Base from '../layouts/Base.astro';
+import { loadSite } from '../lib/site';
+
+const { settings } = await loadSite();
+const rows = [
+  ['motion', 'Motion level this page resolved'],
+  ['override', 'URL override'],
+  ['reduce', 'Device asks for reduced motion'],
+  ['scroll', 'Scroll-linked effects run on'],
+  ['fps', 'Frames per second delivered'],
+  ['css', 'CSS animations advance'],
+  ['timeline', 'document.timeline advances'],
+  ['visibility', 'Page visibility'],
+  ['agent', 'Browser'],
+] as const;
+const links = [
+  ['?motion=full', 'Force full'],
+  ['?motion=calm', 'Force calm'],
+  ['?motion=off', 'Force off'],
+  ['?scroll=js', 'Scroll effects by script'],
+] as const;
+---
+
+<Base
+  title="Motion check · Body Gallery"
+  description="Diagnostics for motion on this device."
+  settings={settings}
+  noindex
+>
+  <section class="wrap max-w-3xl pt-32 pb-24 md:pt-40">
+    <h1 class="t-label">Motion check</h1>
+    <p class="mt-4 max-w-[52ch] text-sm text-muted">
+      Open this on the phone where motion looks wrong and screenshot it. iPhones ask for reduced
+      motion in Low Power Mode as well as under Accessibility &gt; Motion.
+    </p>
+
+    <dl class="mt-10 divide-y divide-line border-y border-line text-sm">
+      {rows.map(([key, label]) => (
+        <div class="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-4 py-3">
+          <dt class="text-muted">{label}</dt>
+          <dd class="font-medium break-words" data-diag={key}>
+            …
+          </dd>
+        </div>
+      ))}
+    </dl>
+
+    <h2 class="mt-12 font-medium">Two bars, two engines</h2>
+    <p class="mt-2 text-sm text-muted">
+      Both should glide back and forth. If only the top one moves, CSS animations are stalled; if
+      only the bottom one moves, the page's script loop is.
+    </p>
+    <div class="mt-6 space-y-4">
+      <div>
+        <p class="mb-2 text-xs text-muted">Moved by CSS</p>
+        <div class="diag-track">
+          <span class="diag-bar diag-css"></span>
+        </div>
+      </div>
+      <div>
+        <p class="mb-2 text-xs text-muted">Moved by script (time-based)</p>
+        <div class="diag-track">
+          <span class="diag-bar" data-diag-js></span>
+        </div>
+      </div>
+    </div>
+
+    <p class="mt-12 text-sm font-medium">Try again with</p>
+    <ul class="mt-3 flex flex-wrap gap-3 text-sm">
+      {links.map(([query, label]) => (
+        <li>
+          <a href={`/motion-check${query}`} class="btn border border-ink/30 hover:border-ink">
+            {label}
+          </a>
+        </li>
+      ))}
+      <li>
+        <a href="/?motion=full" class="btn btn-solid">
+          Home page, full motion
+        </a>
+      </li>
+    </ul>
+  </section>
+</Base>
+
+<style>
+  .diag-track {
+    position: relative;
+    height: 12px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: var(--color-cream);
+  }
+  .diag-bar {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 25%;
+    border-radius: 999px;
+    background: var(--color-brand);
+  }
+  /* Runs whatever the motion level: this page measures the device, not the preference. */
+  .diag-css {
+    animation: diag-glide 2s linear infinite alternate;
+  }
+  @keyframes diag-glide {
+    to {
+      transform: translateX(300%);
+    }
+  }
+</style>
+
+<script>
+  const root = document.documentElement;
+  const out = (key: string, value: string) => {
+    const el = document.querySelector(`[data-diag="${key}"]`);
+    if (el) el.textContent = value;
+  };
+  const override = /[?&](motion|scroll)=([a-z]+)/.exec(location.search);
+  out('motion', root.dataset.motion ?? 'not set');
+  out('override', override ? `${override[1]}=${override[2]}` : 'none');
+  out('reduce', matchMedia('(prefers-reduced-motion: reduce)').matches ? 'yes' : 'no');
+  out(
+    'scroll',
+    root.dataset.scroll === 'css' ? 'CSS scroll timelines' : 'the page script (no CSS support)',
+  );
+  out('agent', navigator.userAgent);
+
+  // Frames delivered, counted over the last second of real time.
+  const stamps: number[] = [];
+  const jsBar = document.querySelector<HTMLElement>('[data-diag-js]');
+  const loop = (now: number) => {
+    stamps.push(now);
+    while (stamps.length && now - (stamps[0] ?? now) > 1000) stamps.shift();
+    // Position from elapsed time, never frame counts: same speed whatever the frame rate.
+    const phase = (now % 4000) / 2000;
+    const x = phase <= 1 ? phase : 2 - phase;
+    if (jsBar) jsBar.style.transform = `translateX(${Math.round(x * 300)}%)`;
+    requestAnimationFrame(loop);
+  };
+  requestAnimationFrame(loop);
+
+  const cssBar = document.querySelector('.diag-css');
+  let lastCss = '';
+  let lastTimeline = -1;
+  const sample = () => {
+    out('fps', stamps.length ? String(stamps.length) : '0 (no frames)');
+    const css = cssBar ? getComputedStyle(cssBar).transform : '';
+    out('css', css && css !== lastCss ? 'yes' : 'no');
+    lastCss = css;
+    const t = Number(document.timeline.currentTime ?? -1);
+    out('timeline', t > lastTimeline ? 'yes' : 'no');
+    lastTimeline = t;
+    out('visibility', document.visibilityState);
+  };
+  window.setInterval(sample, 1000);
+  window.setTimeout(sample, 600);
+</script>

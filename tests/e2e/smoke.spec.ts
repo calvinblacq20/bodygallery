@@ -1,6 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Page } from '@playwright/test';
-import { JS_FLAG_SCRIPT } from '../../src/lib/inline-scripts';
+import { MOTION_SCRIPT } from '../../src/lib/inline-scripts';
 
 const WHATSAPP = 'https://wa.me/233540185528?text=';
 const messageOf = (href: string | null) => new URL(href ?? '').searchParams.get('text') ?? '';
@@ -100,7 +100,7 @@ test('only the hash-allow-listed inline script is present (CSP-ready)', async ({
   for (const path of ['/', '/services']) {
     await page.goto(path);
     const inline = await page.locator('script:not([src])').allTextContents();
-    expect(inline, path).toEqual([JS_FLAG_SCRIPT]);
+    expect(inline, path).toEqual([MOTION_SCRIPT]);
   }
 });
 
@@ -124,10 +124,9 @@ test.describe('without JavaScript (Opera Mini, data savers)', () => {
 });
 
 test('no detectable accessibility violations', async ({ page }) => {
-  // Check the settled page: mid-fade text would fail contrast for a split second.
-  await page.emulateMedia({ reducedMotion: 'reduce' });
+  // Check the settled page (?motion=off): mid-fade text would fail contrast for a moment.
   for (const path of ['/', '/services']) {
-    await page.goto(path);
+    await page.goto(`${path}?motion=off`);
     const results = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])
       .analyze();

@@ -147,11 +147,10 @@ test('FAQ answers open from their question', async ({ page }) => {
 });
 
 test('new pages have no detectable accessibility violations', async ({ page }) => {
-  // Check the settled page: mid-fade text would fail contrast for a split second.
-  await page.emulateMedia({ reducedMotion: 'reduce' });
+  // Check the settled page (?motion=off): mid-fade text would fail contrast for a moment.
   await page.clock.setFixedTime(WEDNESDAY_10AM);
   for (const path of PAGES.slice(2)) {
-    await page.goto(path);
+    await page.goto(`${path}?motion=off`);
     const results = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])
       .analyze();

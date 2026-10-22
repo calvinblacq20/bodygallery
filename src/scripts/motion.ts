@@ -1,13 +1,18 @@
 import Lenis from 'lenis';
 import { formatTime, openStatus, type Closure, type WeeklyHours } from '../lib/hours';
+import { startScrollLoop } from './scroll-loop';
 
-const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const root = document.documentElement;
+// Resolved once in <head> (lib/inline-scripts.ts); never re-read the media query here.
+const motion = root.dataset.motion ?? 'off';
+// Tells the <head> failsafe this script started, so it leaves the motion level alone.
+root.setAttribute('data-motion-ready', '');
 // Phones and tablets keep native scrolling: it's smoother on budget devices, and smooth-scroll
 // fights browser-initiated scrolls there (focusing a form field, scrolling a button into view).
 const touchScreen = window.matchMedia('(pointer: coarse)').matches;
 
 // Smooth, weighted scrolling for wheel and trackpad only.
-if (!reduceMotion && !touchScreen) {
+if (motion === 'full' && !touchScreen) {
   new Lenis({
     autoRaf: true,
     duration: 1.15,
@@ -24,9 +29,10 @@ document.querySelectorAll<HTMLElement>('[data-stagger]').forEach((group) => {
   });
 });
 
-// Reveal elements and groups once as they enter the viewport.
-const revealables = document.querySelectorAll<HTMLElement>('[data-reveal], [data-stagger]');
-if ('IntersectionObserver' in window) {
+if (motion !== 'off') {
+  const revealables = [...document.querySelectorAll<HTMLElement>('[data-reveal], [data-stagger]')];
+  // The observer makes reveals prompt; the scroll loop's position check makes them certain,
+  // so one undelivered callback can never leave content hidden.
   const observer = new IntersectionObserver(
     (entries) => {
       for (const entry of entries) {
@@ -40,8 +46,13 @@ if ('IntersectionObserver' in window) {
     { rootMargin: '100000px 0px -8% 0px', threshold: 0.08 },
   );
   revealables.forEach((el) => observer.observe(el));
-} else {
-  revealables.forEach((el) => el.classList.add('is-in'));
+
+  const jsScroll = root.dataset.scroll === 'js';
+  startScrollLoop({
+    reveals: revealables,
+    effects: motion === 'full' && jsScroll,
+    progress: jsScroll,
+  });
 }
 
 // Carousel arrows. Without JS the track still scrolls by swipe, so the arrows start hidden.
@@ -60,7 +71,7 @@ document.querySelectorAll<HTMLElement>('[data-carousel]').forEach((root) => {
     prev.disabled = track.scrollLeft <= 2;
     next.disabled = track.scrollLeft + track.clientWidth >= track.scrollWidth - 2;
   };
-  const behavior: ScrollBehavior = reduceMotion ? 'auto' : 'smooth';
+  const behavior: ScrollBehavior = motion === 'full' ? 'smooth' : 'auto';
   prev.addEventListener('click', () => track.scrollBy({ left: -step(), behavior }));
   next.addEventListener('click', () => track.scrollBy({ left: step(), behavior }));
   track.addEventListener('scroll', sync, { passive: true });

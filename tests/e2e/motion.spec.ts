@@ -62,7 +62,7 @@ test('the treatment band loops on its own: top row left, bottom row right', asyn
 
 test('every reveal settles and nothing pushes the page sideways while moving', async ({ page }) => {
   test.slow(); // scrolls four long pages a step at a time
-  for (const path of ['/', '/services', '/about', '/services/hammam']) {
+  for (const path of ['/', '/?scroll=js', '/services', '/about', '/services/hammam']) {
     await page.goto(path);
     expect(await scrollThrough(page), path).toBeLessThanOrEqual(0);
     await expect
@@ -78,4 +78,97 @@ test('every reveal settles and nothing pushes the page sideways while moving', a
       )
       .toEqual([]);
   }
+});
+
+test.describe('motion levels (resolved once into <html data-motion>)', () => {
+  const marqueeOffsets = async (page: Page) => {
+    // Scroll to the still wrapper: the moving row itself never settles for Playwright.
+    await page.locator('.marquee-row').first().scrollIntoViewIfNeeded();
+    const read = () =>
+      page
+        .locator('.marquee')
+        .evaluateAll((els) => els.map((el) => new DOMMatrix(getComputedStyle(el).transform).m41));
+    const before = await read();
+    await page.waitForTimeout(800);
+    return { before, after: await read() };
+  };
+
+  test('reduced motion (iOS also asks for it in Low Power Mode) is calm, not frozen', async ({
+    page,
+  }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/');
+    await expect(page.locator('html')).toHaveAttribute('data-motion', 'calm');
+
+    // Ambient loops keep running...
+    const { before, after } = await marqueeOffsets(page);
+    expect(after[0], 'band still loops').toBeLessThan(before[0] ?? 0);
+
+    // ...travel does not: photos stay put in their frames.
+    const img = await page.evaluate(() => {
+      const el = document.querySelector('[data-parallax-img] img');
+      return el ? `${getComputedStyle(el).animationName} ${getComputedStyle(el).translate}` : '';
+    });
+    expect(img).toBe('none none');
+
+    // And content still arrives, as a fade.
+    await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+    await expect
+      .poll(() =>
+        page
+          .locator('#visit [data-reveal]')
+          .first()
+          .evaluate((el) => el.className),
+      )
+      .toContain('is-in');
+  });
+
+  test('?motion=off overrides the device: a complete, still page', async ({ page }) => {
+    await page.goto('/?motion=off');
+    await expect(page.locator('html')).toHaveAttribute('data-motion', 'off');
+    const state = await page.evaluate(() => ({
+      faded: [...document.querySelectorAll('[data-reveal]')].filter(
+        (el) => getComputedStyle(el).opacity !== '1',
+      ).length,
+      band: [...document.querySelectorAll('.marquee')].map(
+        (el) => getComputedStyle(el).animationName,
+      ),
+    }));
+    expect(state).toEqual({ faded: 0, band: ['none', 'none'] });
+  });
+
+  test('?motion=full overrides a reduced-motion device', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/?motion=full');
+    await expect(page.locator('html')).toHaveAttribute('data-motion', 'full');
+  });
+
+  test('without CSS scroll timelines the script drives the effects (Safari before 26)', async ({
+    page,
+  }) => {
+    await page.goto('/?scroll=js');
+    await expect(page.locator('html')).toHaveAttribute('data-scroll', 'js');
+    const read = () =>
+      page.evaluate(() => {
+        const copy = document.querySelector<HTMLElement>('.hero-copy');
+        const bar = document.querySelector('.scroll-progress');
+        const tilt = document.querySelector<HTMLElement>('[data-tilt]');
+        return {
+          copy: Number(copy ? getComputedStyle(copy).opacity : 1),
+          bar: bar ? new DOMMatrix(getComputedStyle(bar).transform).a : 0,
+          tilt: tilt?.style.getPropertyValue('rotate') ?? '',
+          cssRunning: copy ? copy.getAnimations().length : 0,
+        };
+      });
+    await expect.poll(async () => (await read()).tilt).toMatch(/deg$/);
+    expect((await read()).cssRunning, 'CSS engine stays out of the way').toBe(0);
+
+    await page.evaluate(() => window.scrollTo(0, Math.round(window.innerHeight * 0.7)));
+    await expect
+      .poll(async () => (await read()).copy, { message: 'hero words fade' })
+      .toBeLessThan(0.5);
+    await expect
+      .poll(async () => (await read()).bar, { message: 'progress line grows' })
+      .toBeGreaterThan(0);
+  });
 });

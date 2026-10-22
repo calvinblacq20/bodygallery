@@ -9,7 +9,7 @@ import Header from '../components/Header.astro';
 import QuickActions from '../components/QuickActions.astro';
 import type { Settings } from '../content/schemas';
 import { generalBookingUrl } from '../lib/booking';
-import { JS_FLAG_SCRIPT } from '../lib/inline-scripts';
+import { MOTION_SCRIPT } from '../lib/inline-scripts';
 import { PRELAUNCH } from '../lib/site';
 
 interface Props {
@@ -19,24 +19,33 @@ interface Props {
   headerTone?: 'light' | 'dark';
   /** Book button in the on-screen Book / Call / WhatsApp actions; off where the page is the booking flow. */
   bookAction?: boolean;
+  /** Keep this page out of search engines even after launch (tools such as /motion-check). */
+  noindex?: boolean;
 }
 
-const { title, description, settings, headerTone = 'dark', bookAction = true } = Astro.props;
+const {
+  title,
+  description,
+  settings,
+  headerTone = 'dark',
+  bookAction = true,
+  noindex = false,
+} = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const bookUrl = generalBookingUrl(settings.whatsappE164);
 ---
 
 <!doctype html>
-<html lang="en-GH">
+<html lang="en-GH" data-motion="off">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script is:inline set:html={JS_FLAG_SCRIPT} />
+    <script is:inline set:html={MOTION_SCRIPT} />
     <link rel="preload" href={headingFont} as="font" type="font/woff2" crossorigin />
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
-    {PRELAUNCH && <meta name="robots" content="noindex, nofollow" />}
+    {(PRELAUNCH || noindex) && <meta name="robots" content="noindex, nofollow" />}
     <meta name="theme-color" content="#fcfcfb" />
     <link rel="icon" href="/favicon-48.png" type="image/png" sizes="48x48" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />

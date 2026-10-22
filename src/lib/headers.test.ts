@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { JS_FLAG_SCRIPT } from './inline-scripts';
+import { MOTION_SCRIPT } from './inline-scripts';
 
 interface VercelConfig {
   trailingSlash?: boolean;
@@ -15,7 +15,7 @@ const header = (name: string) => sitewide.find((h) => h.key === name)?.value;
 
 describe('security headers', () => {
   it('allow-lists the exact inline script by hash', () => {
-    const hash = createHash('sha256').update(JS_FLAG_SCRIPT).digest('base64');
+    const hash = createHash('sha256').update(MOTION_SCRIPT).digest('base64');
     expect(header('Content-Security-Policy-Report-Only')).toContain(`'sha256-${hash}'`);
   });
 
