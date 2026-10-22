@@ -7,7 +7,9 @@ export default defineConfig({
   site: 'https://bodygalleryaesthetics.com',
   trailingSlash: 'never',
   build: {
-    format: 'file',
+    // services/index.html rather than services.html: /services and the /services/<slug>
+    // pages can then live side by side on any static host (Vercel, Cloudflare, Netlify).
+    format: 'directory',
   },
   vite: {
     plugins: [tailwindcss()],

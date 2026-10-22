@@ -67,7 +67,7 @@ const values = [
   headerTone="light"
 >
   <!-- Hero -->
-  <section class="relative flex min-h-[100svh] flex-col overflow-hidden text-white">
+  <section class="relative flex min-h-[calc(100svh_-_var(--book-bar-space,0px))] flex-col overflow-hidden text-white">
     <Photo
       src={heroPhoto}
       alt="Close-up of a woman's glowing skin"
@@ -319,7 +319,7 @@ const values = [
           <span class="block">your choice</span>
         </h2>
         <p
-          class="mt-8 max-w-[30ch] text-sm md:absolute md:top-3 md:right-0 md:mt-0"
+          class="mt-8 max-w-[34ch] text-sm md:mt-12 md:ml-auto md:text-[0.95rem]"
           data-reveal
           style="--reveal-delay:0.15s"
         >

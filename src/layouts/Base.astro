@@ -16,9 +16,11 @@ interface Props {
   description: string;
   settings: Settings;
   headerTone?: 'light' | 'dark';
+  /** Sticky "Book on WhatsApp" bar on phones; off where the page itself is the booking flow. */
+  bookBar?: boolean;
 }
 
-const { title, description, settings, headerTone = 'dark' } = Astro.props;
+const { title, description, settings, headerTone = 'dark', bookBar = true } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const bookUrl = generalBookingUrl(settings.whatsappE164);
 ---
@@ -56,9 +58,11 @@ const bookUrl = generalBookingUrl(settings.whatsappE164);
     </main>
     <Footer settings={settings} bookUrl={bookUrl} />
 
-    <a href={bookUrl} class="book-bar" data-event="book_whatsapp" data-event-label="sticky-bar">
-      Book on WhatsApp <span aria-hidden="true">→</span>
-    </a>
+    {bookBar && (
+      <a href={bookUrl} class="book-bar" data-event="book_whatsapp" data-event-label="sticky-bar">
+        Book on WhatsApp <span aria-hidden="true">→</span>
+      </a>
+    )}
 
     <script>
       import '../scripts/motion';
@@ -90,8 +94,10 @@ const bookUrl = generalBookingUrl(settings.whatsappE164);
     box-shadow: 0 10px 30px rgb(0 0 0 / 0.18);
   }
   @media (max-width: 767px) {
-    :global(body) {
-      padding-bottom: 76px;
+    :global(body:has(.book-bar)) {
+      /* Full-height sections subtract this so the bar never covers their last line. */
+      --book-bar-space: 76px;
+      padding-bottom: var(--book-bar-space);
     }
   }
 </style>

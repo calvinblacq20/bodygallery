@@ -149,7 +149,7 @@ Content lives in `src/content/` and is checked with Zod at build time. If the co
 
 **Hosting & delivery**
 
-- **Cloudflare** static hosting (free; it has a point of presence in Accra), Cloudflare DNS, and security headers in `_headers`.
+- **Vercel** static hosting (Calvin's choice at deploy time, 22 Oct 2026; Cloudflare was the original plan), deployed from GitHub `main`, with security headers in `vercel.json`.
 - Every PR gets a preview deployment with `noindex`, protected behind **Cloudflare Access**.
 - **Domain:** a custom `.com` (A7). HTTPS forced, HSTS on.
 

@@ -24,7 +24,7 @@ const links = [
 >
   <div class="wrap flex h-20 items-center justify-between md:h-28">
     <div class="flex items-center gap-[clamp(2rem,9vw,11rem)]">
-      <a href="/" class="block shrink-0" aria-label="Body Gallery home">
+      <a href="/" class="block shrink-0 py-1" aria-label="Body Gallery home">
         <Logo
           tone={tone === 'light' ? 'light' : 'dark'}
           width={210}
@@ -32,7 +32,7 @@ const links = [
           eager
         />
       </a>
-      <nav aria-label="Main" class="hidden md:block">
+      <nav aria-label="Main" class="hidden lg:block">
         <ul class="flex gap-6 text-[1.05rem]">
           {links.map(({ href, label }) => (
             <li>
@@ -47,14 +47,14 @@ const links = [
 
     <a
       href="/book"
-      class:list={['btn hidden md:inline-flex', tone === 'light' ? 'btn-ghost-light' : 'btn-solid']}
+      class:list={['btn hidden lg:inline-flex', tone === 'light' ? 'btn-ghost-light' : 'btn-solid']}
     >
       Book now <span aria-hidden="true">→</span>
     </a>
 
     <button
       type="button"
-      class="grid h-11 w-11 place-items-center md:hidden"
+      class="grid h-11 w-11 place-items-center lg:hidden"
       popovertarget="mobile-menu"
       aria-label="Open menu"
     >
@@ -67,7 +67,7 @@ const links = [
 
 <div id="mobile-menu" popover class="mobile-menu text-ink">
   <div class="wrap flex h-20 items-center justify-between">
-    <a href="/" class="block shrink-0" aria-label="Body Gallery home">
+    <a href="/" class="block shrink-0 py-1" aria-label="Body Gallery home">
       <Logo width={170} class="h-9 w-auto" />
     </a>
     <button

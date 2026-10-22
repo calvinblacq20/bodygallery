@@ -3,7 +3,7 @@ import { assertContentIntegrity } from './content-integrity';
 
 /**
  * Pre-launch the site must not be indexed. Flip this at launch (PRD M3) together with
- * removing the X-Robots-Tag header in public/_headers and opening up public/robots.txt.
+ * removing the X-Robots-Tag header in vercel.json and opening up public/robots.txt.
  */
 export const PRELAUNCH = true;
 

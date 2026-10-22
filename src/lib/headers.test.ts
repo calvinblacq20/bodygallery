@@ -3,13 +3,15 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { JS_FLAG_SCRIPT } from './inline-scripts';
 
-const headers = readFileSync(new URL('../../public/_headers', import.meta.url), 'utf8');
-const header = (name: string) =>
-  headers
-    .split('\n')
-    .find((line) => line.trim().startsWith(`${name}:`))
-    ?.split(/:\s(.+)/)[1]
-    ?.trim();
+interface VercelConfig {
+  trailingSlash?: boolean;
+  headers: { source: string; headers: { key: string; value: string }[] }[];
+}
+const config = JSON.parse(
+  readFileSync(new URL('../../vercel.json', import.meta.url), 'utf8'),
+) as VercelConfig;
+const sitewide = config.headers.find((h) => h.source === '/(.*)')?.headers ?? [];
+const header = (name: string) => sitewide.find((h) => h.key === name)?.value;
 
 describe('security headers', () => {
   it('allow-lists the exact inline script by hash', () => {
@@ -44,5 +46,13 @@ describe('security headers', () => {
   it('sends HSTS for at least a year', () => {
     const maxAge = Number(/max-age=(\d+)/.exec(header('Strict-Transport-Security') ?? '')?.[1]);
     expect(maxAge).toBeGreaterThanOrEqual(31536000);
+  });
+
+  it('keeps the pre-launch site out of search engines', () => {
+    expect(header('X-Robots-Tag')).toBe('noindex, nofollow');
+  });
+
+  it('serves pages without a trailing slash, matching canonical URLs', () => {
+    expect(config.trailingSlash).toBe(false);
   });
 });
