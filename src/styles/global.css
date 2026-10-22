@@ -401,26 +401,23 @@ html.lenis body {
    Rules below key off that attribute, never the media query. Scroll-linked effects use CSS
    scroll timelines when <html data-scroll="css">; otherwise motion.ts drives them. */
 
-/* Treatment band: rows loop at a constant rate inside their own frame, so they run in calm
-   too. Each row holds two identical halves; moving by half its width is one seamless lap. */
+/* Treatment band and photo strip: loops at a constant rate inside their own frame, so they
+   run in calm too. Each row holds two identical halves; moving by half its width is one seamless lap. */
 .marquee {
   display: flex;
   width: max-content;
 }
+/* Each loop sets its own lap time with --marquee-time (phones) and --marquee-time-md. */
 :is([data-motion='full'], [data-motion='calm']) .marquee {
-  animation: marquee 32s linear infinite;
-}
-:is([data-motion='full'], [data-motion='calm']) .marquee[data-direction='right'] {
-  animation-direction: reverse;
-  animation-duration: 38s;
+  animation: marquee var(--marquee-time, 32s) linear infinite;
 }
 @media (min-width: 768px) {
   :is([data-motion='full'], [data-motion='calm']) .marquee {
-    animation-duration: 55s;
+    animation-duration: var(--marquee-time-md, 55s);
   }
-  :is([data-motion='full'], [data-motion='calm']) .marquee[data-direction='right'] {
-    animation-duration: 64s;
-  }
+}
+:is([data-motion='full'], [data-motion='calm']) .marquee[data-direction='right'] {
+  animation-direction: reverse;
 }
 .marquee-row:hover .marquee {
   animation-play-state: paused;
@@ -606,12 +603,6 @@ html.lenis body {
     animation-timeline: view();
     animation-range: entry 10% cover 60%;
   }
-  [data-motion='full'][data-scroll='css'] [data-drift] {
-    animation-name: drift;
-    animation-timing-function: linear;
-    animation-fill-mode: both;
-    animation-timeline: view();
-  }
   [data-motion='full'][data-scroll='css'] [data-parallax-img] img {
     animation-name: img-parallax;
     animation-timing-function: linear;
@@ -644,6 +635,14 @@ html.lenis body {
     animation-timeline: --hero;
     animation-range: exit 0% exit 80%;
   }
+  /* Calm keeps the fade but not the lift: opacity is not motion. */
+  [data-motion='calm'][data-scroll='css'] .hero-copy {
+    animation-name: hero-fade;
+    animation-timing-function: linear;
+    animation-fill-mode: both;
+    animation-timeline: --hero;
+    animation-range: exit 0% exit 80%;
+  }
 }
 @keyframes parallax {
   from {
@@ -664,14 +663,6 @@ html.lenis body {
 @keyframes draw {
   to {
     stroke-dashoffset: 0;
-  }
-}
-@keyframes drift {
-  from {
-    transform: translate3d(8%, 0, 0);
-  }
-  to {
-    transform: translate3d(-8%, 0, 0);
   }
 }
 @keyframes img-parallax {
@@ -700,6 +691,11 @@ html.lenis body {
   to {
     opacity: 0;
     translate: 0 -14%;
+  }
+}
+@keyframes hero-fade {
+  to {
+    opacity: 0;
   }
 }
 

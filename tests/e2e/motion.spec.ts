@@ -30,25 +30,19 @@ test('scroll-linked effects survive the production build', async ({ page }) => {
 
   // A minifier folding animation-timeline into the animation shorthand switches these off.
   const names = await page.evaluate(() =>
-    [
-      '.scroll-progress',
-      '.hero-copy',
-      '[data-drift]',
-      '[data-tilt]',
-      '[data-parallax-img] img',
-    ].map((selector) => {
+    ['.scroll-progress', '.hero-copy', '[data-tilt]', '[data-parallax-img] img'].map((selector) => {
       const el = document.querySelector(selector);
       return el ? getComputedStyle(el).animationName : `${selector} missing`;
     }),
   );
-  expect(names).toEqual(['scroll-progress', 'hero-copy', 'drift', 'tilt', 'img-parallax']);
+  expect(names).toEqual(['scroll-progress', 'hero-copy', 'tilt', 'img-parallax']);
 });
 
 test('the treatment band loops on its own: top row left, bottom row right', async ({ page }) => {
   await page.goto('/');
-  const rows = page.locator('.marquee');
-  // Scroll to the still wrapper: the moving row itself never settles for Playwright.
-  await page.locator('.marquee-row').first().scrollIntoViewIfNeeded();
+  const rows = page.locator('[data-treatment-band] .marquee');
+  // Scroll to the still section: the moving rows themselves never settle for Playwright.
+  await page.locator('[data-treatment-band]').scrollIntoViewIfNeeded();
   const offsets = () =>
     rows.evaluateAll((els) => els.map((el) => new DOMMatrix(getComputedStyle(el).transform).m41));
   const before = await offsets();
@@ -81,16 +75,31 @@ test('every reveal settles and nothing pushes the page sideways while moving', a
 });
 
 test.describe('motion levels (resolved once into <html data-motion>)', () => {
-  const marqueeOffsets = async (page: Page) => {
-    // Scroll to the still wrapper: the moving row itself never settles for Playwright.
-    await page.locator('.marquee-row').first().scrollIntoViewIfNeeded();
+  /** How far a loop's first row travels in 0.8s (negative = leftward). */
+  const loopTravel = async (page: Page, scope: string) => {
+    // Scroll to the still wrapper: a moving loop never settles for Playwright.
+    await page.locator(scope).scrollIntoViewIfNeeded();
     const read = () =>
       page
-        .locator('.marquee')
-        .evaluateAll((els) => els.map((el) => new DOMMatrix(getComputedStyle(el).transform).m41));
+        .locator(`${scope} .marquee`)
+        .first()
+        .evaluate((el) => new DOMMatrix(getComputedStyle(el).transform).m41);
     const before = await read();
     await page.waitForTimeout(800);
-    return { before, after: await read() };
+    return (await read()) - before;
+  };
+  /** The hero words' opacity and lift after scrolling 70% of a screen. */
+  const heroAfterScroll = async (page: Page) => {
+    await page.evaluate(() => window.scrollTo(0, Math.round(window.innerHeight * 0.7)));
+    const read = () =>
+      page.locator('.hero-copy').evaluate((el) => ({
+        opacity: Number(getComputedStyle(el).opacity),
+        translate: getComputedStyle(el).translate,
+      }));
+    await expect
+      .poll(async () => (await read()).opacity, { message: 'hero words fade' })
+      .toBeLessThan(0.5);
+    return read();
   };
 
   test('reduced motion (iOS also asks for it in Low Power Mode) is calm, not frozen', async ({
@@ -101,8 +110,8 @@ test.describe('motion levels (resolved once into <html data-motion>)', () => {
     await expect(page.locator('html')).toHaveAttribute('data-motion', 'calm');
 
     // Ambient loops keep running...
-    const { before, after } = await marqueeOffsets(page);
-    expect(after[0], 'band still loops').toBeLessThan(before[0] ?? 0);
+    expect(await loopTravel(page, '[data-treatment-band]'), 'band loops').toBeLessThan(0);
+    expect(await loopTravel(page, '[data-photo-strip]'), 'photo strip loops').toBeLessThan(0);
 
     // ...travel does not: photos stay put in their frames.
     const img = await page.evaluate(() => {
@@ -110,6 +119,10 @@ test.describe('motion levels (resolved once into <html data-motion>)', () => {
       return el ? `${getComputedStyle(el).animationName} ${getComputedStyle(el).translate}` : '';
     });
     expect(img).toBe('none none');
+
+    // The hero words fade as the hero leaves, but don't lift.
+    await page.evaluate(() => window.scrollTo(0, 0));
+    expect((await heroAfterScroll(page)).translate, 'no lift in calm').toBe('none');
 
     // And content still arrives, as a fade.
     await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
@@ -130,11 +143,11 @@ test.describe('motion levels (resolved once into <html data-motion>)', () => {
       faded: [...document.querySelectorAll('[data-reveal]')].filter(
         (el) => getComputedStyle(el).opacity !== '1',
       ).length,
-      band: [...document.querySelectorAll('.marquee')].map(
-        (el) => getComputedStyle(el).animationName,
+      loopsStill: [...document.querySelectorAll('.marquee')].every(
+        (el) => getComputedStyle(el).animationName === 'none',
       ),
     }));
-    expect(state).toEqual({ faded: 0, band: ['none', 'none'] });
+    expect(state).toEqual({ faded: 0, loopsStill: true });
   });
 
   test('?motion=full overrides a reduced-motion device', async ({ page }) => {
@@ -170,5 +183,15 @@ test.describe('motion levels (resolved once into <html data-motion>)', () => {
     await expect
       .poll(async () => (await read()).bar, { message: 'progress line grows' })
       .toBeGreaterThan(0);
+  });
+
+  test('calm on a browser without CSS scroll timelines still fades the hero words', async ({
+    page,
+  }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/?scroll=js');
+    await expect(page.locator('html')).toHaveAttribute('data-motion', 'calm');
+    await expect(page.locator('html')).toHaveAttribute('data-scroll', 'js');
+    expect((await heroAfterScroll(page)).translate, 'no lift in calm').toBe('none');
   });
 });

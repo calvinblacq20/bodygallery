@@ -36,17 +36,29 @@ const tiles = [
       </a>
     </span>
   </h2>
-  <div class="mt-14 flex items-center justify-center gap-3 md:gap-5" data-drift>
-    {tiles.map((t) => (
-      <Photo
-        src={t.src}
-        alt=""
-        sizes="(min-width: 768px) 13vw, 30vw"
-        widths={[300, 600]}
-        tone={t.tone}
-        note={t.note}
-        class:list={['w-[30vw] shrink-0 rounded-md md:w-[13vw]', t.h]}
-      />
-    ))}
+  <!-- Loops at a constant rate inside its own frame, like the treatment band, so it runs in
+       calm mode too. Two identical halves; each holds the tiles twice, so a half is always
+       wider than the window and the loop never shows a gap. -->
+  <div class="marquee-row mt-14" data-photo-strip>
+    <div class="marquee" style="--marquee-time:48s;--marquee-time-md:80s">
+      {[0, 1].map((half) => (
+        <div
+          class="flex shrink-0 items-center gap-3 pr-3 md:gap-5 md:pr-5"
+          aria-hidden={half === 1 ? 'true' : undefined}
+        >
+          {[...tiles, ...tiles].map((t) => (
+            <Photo
+              src={t.src}
+              alt=""
+              sizes="(min-width: 768px) 13vw, 30vw"
+              widths={[300, 600]}
+              tone={t.tone}
+              note={t.note}
+              class:list={['w-[30vw] shrink-0 rounded-md md:w-[13vw]', t.h]}
+            />
+          ))}
+        </div>
+      ))}
+    </div>
   </div>
 </section>

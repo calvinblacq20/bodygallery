@@ -18,12 +18,22 @@ interface Options {
   reveals: HTMLElement[];
   /** Drive the scroll-linked effects here instead of in CSS. */
   effects: boolean;
+  /** Calm only: fade the hero words as the hero leaves, without moving them. */
+  heroFade: boolean;
   /** Drive the reading-progress line here instead of in CSS. */
   progress: boolean;
 }
 
 type Kind =
-  'parallax' | 'zoom' | 'draw' | 'drift' | 'img' | 'tilt' | 'tilt-img' | 'hero-photo' | 'hero-copy';
+  | 'parallax'
+  | 'zoom'
+  | 'draw'
+  | 'img'
+  | 'tilt'
+  | 'tilt-img'
+  | 'hero-photo'
+  | 'hero-copy'
+  | 'hero-fade';
 
 interface Tracked {
   el: HTMLElement | SVGElement;
@@ -47,26 +57,27 @@ function docTop(el: HTMLElement): number {
   return y;
 }
 
-export function startScrollLoop({ reveals, effects, progress }: Options) {
+export function startScrollLoop({ reveals, effects, heroFade, progress }: Options) {
   const root = document.documentElement;
   const pending = reveals.map((el) => ({ el, top: 0 }));
   const tracked: Tracked[] = [];
   const heroSection = document.querySelector<HTMLElement>('.hero');
 
+  const add = (selector: string, kind: Kind) =>
+    document
+      .querySelectorAll<HTMLElement | SVGElement>(selector)
+      .forEach((el) => tracked.push({ el, kind, top: 0, height: 0, travel: 0, shown: true }));
   if (effects) {
-    const add = (selector: string, kind: Kind) =>
-      document
-        .querySelectorAll<HTMLElement | SVGElement>(selector)
-        .forEach((el) => tracked.push({ el, kind, top: 0, height: 0, travel: 0, shown: true }));
     add('[data-parallax]', 'parallax');
     add('[data-zoom-out]', 'zoom');
     add('[data-draw]', 'draw');
-    add('[data-drift]', 'drift');
     add('[data-parallax-img] img', 'img');
     add('[data-tilt]', 'tilt');
     add('[data-tilt] img', 'tilt-img');
     add('.hero-photo', 'hero-photo');
     add('.hero-copy', 'hero-copy');
+  } else if (heroFade) {
+    add('.hero-copy', 'hero-fade');
   }
   const bar = progress ? document.querySelector<HTMLElement>('.scroll-progress') : null;
 
@@ -86,7 +97,7 @@ export function startScrollLoop({ reveals, effects, progress }: Options) {
     for (const t of tracked) {
       // The hero effects follow the hero section; a drawn path follows its <svg>.
       const box =
-        t.kind === 'hero-photo' || t.kind === 'hero-copy'
+        t.kind === 'hero-photo' || t.kind === 'hero-copy' || t.kind === 'hero-fade'
           ? heroSection
           : t.el instanceof SVGElement
             ? t.el.ownerSVGElement
@@ -135,9 +146,6 @@ export function startScrollLoop({ reveals, effects, progress }: Options) {
         // CSS range: entry 10% to cover 60%.
         write(t.el, 'stroke-dashoffset', String(round(1 - clamp((cover - 0.05) / 0.55))));
         break;
-      case 'drift':
-        write(t.el, 'translate', `${round(8 - 16 * cover, 2)}% 0`);
-        break;
       case 'img':
         write(t.el, 'translate', `0 ${round(-6 + 12 * cover, 2)}%`);
         break;
@@ -159,6 +167,9 @@ export function startScrollLoop({ reveals, effects, progress }: Options) {
         write(t.el, 'translate', `0 ${round(-14 * e, 2)}%`);
         break;
       }
+      case 'hero-fade':
+        write(t.el, 'opacity', String(round(1 - exit(0.8))));
+        break;
     }
   };
 

@@ -51,6 +51,7 @@ if (motion !== 'off') {
   startScrollLoop({
     reveals: revealables,
     effects: motion === 'full' && jsScroll,
+    heroFade: motion === 'calm' && jsScroll,
     progress: jsScroll,
   });
 }
