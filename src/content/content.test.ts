@@ -135,3 +135,29 @@ describe('contentProblems', () => {
     expect(contentProblems([], [hiddenPkg])).toEqual([]);
   });
 });
+
+describe('photo licensing', () => {
+  const dir = new URL('../assets/photos/', import.meta.url);
+  const sources = JSON.parse(readFileSync(new URL('sources.json', dir), 'utf8')) as Record<
+    string,
+    { page: string; license: string }
+  >;
+  const files = readdirSync(dir)
+    .filter((f) => /\.(jpe?g|png|webp|avif)$/i.test(f))
+    .map((f) => f.replace(/\.[^.]+$/, ''));
+
+  it('every photo in the repo has a recorded source and license', () => {
+    expect(files.filter((f) => !sources[f])).toEqual([]);
+  });
+
+  it('every recorded source still has its photo file', () => {
+    expect(Object.keys(sources).filter((k) => !files.includes(k))).toEqual([]);
+  });
+
+  it('records a source page for each photo', () => {
+    for (const [slot, s] of Object.entries(sources)) {
+      expect(s.page, slot).toMatch(/^https:\/\//);
+      expect(s.license, slot).not.toBe('');
+    }
+  });
+});

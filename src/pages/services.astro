@@ -2,6 +2,10 @@
 import LetterTitle from '../components/LetterTitle.astro';
 import PackagesSection from '../components/PackagesSection.astro';
 import Photo from '../components/Photo.astro';
+import stripBrows from '../assets/photos/strip-brows.jpg';
+import stripMask from '../assets/photos/strip-mask.jpg';
+import stripOil from '../assets/photos/strip-oil.jpg';
+import stripStones from '../assets/photos/strip-stones.jpg';
 import SectionTitle from '../components/SectionTitle.astro';
 import ServiceRow from '../components/ServiceRow.astro';
 import Base from '../layouts/Base.astro';
@@ -21,10 +25,30 @@ const updated = new Date(settings.pricesUpdatedAt).toLocaleDateString('en-GB', {
   year: 'numeric',
 });
 const strip = [
-  { tone: 'warm', note: 'Hands applying oil' },
-  { tone: 'blush', note: 'Facial mask detail' },
-  { tone: 'deep', note: 'Hot stones close-up' },
-  { tone: 'cream', note: 'Brow mapping' },
+  {
+    src: stripOil,
+    alt: 'Hand resting on glowing, oiled skin',
+    tone: 'warm',
+    note: 'Hands applying oil',
+  },
+  {
+    src: stripMask,
+    alt: "Practitioner brushing a mask onto a client's face",
+    tone: 'blush',
+    note: 'Facial mask detail',
+  },
+  {
+    src: stripStones,
+    alt: 'Woman relaxing beside warm massage stones',
+    tone: 'deep',
+    note: 'Hot stones close-up',
+  },
+  {
+    src: stripBrows,
+    alt: "Practitioner working on a client's face during a treatment",
+    tone: 'cream',
+    note: 'Brow mapping',
+  },
 ] as const;
 ---
 
@@ -43,7 +67,10 @@ const strip = [
   <div class="wrap mt-12 grid grid-cols-2 gap-2 md:mt-16 md:grid-cols-4">
     {strip.map((p, i) => (
       <Photo
-        alt="A Body Gallery treatment in progress"
+        src={p.src}
+        alt={p.alt}
+        sizes="(min-width: 768px) 22vw, 48vw"
+        widths={[400, 800]}
         tone={p.tone}
         note={p.note}
         class="aspect-[3/4] md:aspect-[4/5]"

@@ -177,7 +177,10 @@
   .photo-slot[data-tone='cream'] {
     --photo-tone: radial-gradient(100% 100% at 50% 40%, #f4ebe2 0%, #e3d3c4 60%, #c9b39f 100%);
   }
-  .photo-slot > img {
+  /* The photo always fills its slot; the slot decides the shape. */
+  .photo-slot img {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;

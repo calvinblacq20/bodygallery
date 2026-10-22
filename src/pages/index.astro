@@ -3,6 +3,19 @@ import GiantWord from '../components/GiantWord.astro';
 import Icon from '../components/Icon.astro';
 import PackagesSection from '../components/PackagesSection.astro';
 import Photo from '../components/Photo.astro';
+import consultationPhoto from '../assets/photos/consultation.jpg';
+import exploreBeautyPhoto from '../assets/photos/explore-beauty.jpg';
+import exploreSpaPhoto from '../assets/photos/explore-spa.jpg';
+import follow1 from '../assets/photos/follow-1.jpg';
+import follow2 from '../assets/photos/follow-2.jpg';
+import follow3 from '../assets/photos/follow-3.jpg';
+import follow4 from '../assets/photos/follow-4.jpg';
+import follow5 from '../assets/photos/follow-5.jpg';
+import follow6 from '../assets/photos/follow-6.jpg';
+import follow7 from '../assets/photos/follow-7.jpg';
+import heroPhoto from '../assets/photos/hero.jpg';
+import ovalPhoto from '../assets/photos/oval.jpg';
+import statementPhoto from '../assets/photos/statement.jpg';
 import SectionTitle from '../components/SectionTitle.astro';
 import ServiceCard from '../components/ServiceCard.astro';
 import Base from '../layouts/Base.astro';
@@ -63,13 +76,13 @@ const values = [
 ] as const;
 
 const followTiles = [
-  { tone: 'warm', h: 'h-[34vw] md:h-[15vw]', note: 'Client portrait after facial' },
-  { tone: 'blush', h: 'h-[40vw] md:h-[19vw]', note: 'Massage hands detail' },
-  { tone: 'cream', h: 'h-[36vw] md:h-[16vw]', note: 'Treatment room' },
-  { tone: 'deep', h: 'h-[52vw] md:h-[26vw]', note: 'Hero portrait, glowing skin' },
-  { tone: 'warm', h: 'h-[38vw] md:h-[18vw]', note: 'Ombré brows result' },
-  { tone: 'blush', h: 'h-[42vw] md:h-[20vw]', note: 'Pedicure detail' },
-  { tone: 'cream', h: 'h-[34vw] md:h-[15vw]', note: 'Steam sauna' },
+  { src: follow1, tone: 'warm', h: 'h-[34vw] md:h-[15vw]', note: 'Client portrait after facial' },
+  { src: follow2, tone: 'blush', h: 'h-[40vw] md:h-[19vw]', note: 'Massage hands detail' },
+  { src: follow3, tone: 'cream', h: 'h-[36vw] md:h-[16vw]', note: 'Treatment room' },
+  { src: follow4, tone: 'deep', h: 'h-[52vw] md:h-[26vw]', note: 'Hero portrait, glowing skin' },
+  { src: follow5, tone: 'warm', h: 'h-[38vw] md:h-[18vw]', note: 'Ombré brows result' },
+  { src: follow6, tone: 'blush', h: 'h-[42vw] md:h-[20vw]', note: 'Pedicure detail' },
+  { src: follow7, tone: 'cream', h: 'h-[34vw] md:h-[15vw]', note: 'Steam sauna' },
 ] as const;
 ---
 
@@ -82,7 +95,10 @@ const followTiles = [
   <!-- Hero -->
   <section class="relative flex min-h-[100svh] flex-col overflow-hidden text-white">
     <Photo
-      alt="A Body Gallery client relaxing after a treatment"
+      src={heroPhoto}
+      alt="Close-up of a woman's glowing skin"
+      position="50% 64%"
+      widths={[800, 1400, 2000]}
       tone="deep"
       note="Hero: close-up portrait, warm studio light, calm expression"
       class="absolute inset-0"
@@ -155,7 +171,10 @@ const followTiles = [
         >
           <div class="oval h-full w-full">
             <Photo
-              alt="Portrait of a smiling Body Gallery client"
+              src={ovalPhoto}
+              alt="Smiling woman with glowing skin"
+              position="50% 30%"
+              sizes="(min-width: 768px) 44vw, 78vw"
               tone="warm"
               class="h-full w-full"
               inner="counter-rotate"
@@ -194,7 +213,11 @@ const followTiles = [
 
     <div class="grid grid-cols-[minmax(0,1fr)] md:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
       <Photo
-        alt="Massage in the Body Gallery treatment room"
+        src={exploreSpaPhoto}
+        alt="Woman smiling with her eyes closed on a massage table"
+        position="50% 35%"
+        sizes="46vw"
+        widths={[600, 1000, 1200]}
         tone="warm"
         note="Massage in progress, low warm light"
         class="hidden md:block md:aspect-square"
@@ -289,7 +312,11 @@ const followTiles = [
         </div>
       </div>
       <Photo
-        alt="Close-up of freshly shaped ombré brows"
+        src={exploreBeautyPhoto}
+        alt="Woman smiling during an eyebrow treatment"
+        position="40% 50%"
+        sizes="46vw"
+        widths={[600, 1000, 1200]}
         tone="blush"
         note="Ombré brows result, close-up"
         class="hidden md:block md:aspect-square"
@@ -301,7 +328,10 @@ const followTiles = [
   <!-- Statement -->
   <section class="relative overflow-hidden py-24 text-white md:py-36">
     <Photo
-      alt="Warm close-up of skin in natural light"
+      src={statementPhoto}
+      alt="Woman with glowing skin and her eyes closed"
+      position="50% 32%"
+      widths={[800, 1400, 2000]}
       tone="deep"
       note="Statement backdrop: warm close-up portrait"
       class="absolute inset-0"
@@ -390,10 +420,13 @@ const followTiles = [
         </ul>
       </div>
       <Photo
-        alt="Consultation before a skin treatment"
+        src={consultationPhoto}
+        alt="Practitioner in a white coat treating a client's skin"
+        position="50% 55%"
+        sizes="(min-width: 768px) 45vw, 100vw"
         tone="cream"
         note="Consultation: practitioner and client talking, notes on a clipboard"
-        class="aspect-[4/3] rounded-md md:mt-24"
+        class="aspect-[4/5] rounded-md md:mt-12 md:aspect-[5/6]"
         data-reveal="fade"
       />
     </div>
@@ -488,7 +521,10 @@ const followTiles = [
     <div class="mt-14 flex items-center justify-center gap-3 md:gap-5" data-drift>
       {followTiles.map((t) => (
         <Photo
+          src={t.src}
           alt=""
+          sizes="(min-width: 768px) 13vw, 30vw"
+          widths={[300, 600]}
           tone={t.tone}
           note={t.note}
           class:list={['w-[30vw] shrink-0 rounded-md md:w-[13vw]', t.h]}

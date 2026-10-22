@@ -6,13 +6,17 @@ interface Props {
   src?: ImageMetadata | undefined;
   /** Empty string marks the image as decorative. */
   alt: string;
-  /** Placeholder colouring until the real photo is supplied (PRD M0 shoot). */
+  /** Background colouring while the photo loads, or in place of a missing photo. */
   tone?: 'deep' | 'warm' | 'blush' | 'cream';
-  /** Art-direction note shown on the placeholder so the shoot list writes itself. */
+  /** Art-direction note shown only when no photo is supplied, so the shoot list writes itself. */
   note?: string;
   class?: string;
   eager?: boolean;
   sizes?: string;
+  /** Generated widths; keep them close to the largest size the slot is shown at. */
+  widths?: number[];
+  /** CSS object-position, to keep the subject in frame when the slot crops the photo. */
+  position?: string;
   inner?: string;
   style?: string;
   [key: `data-${string}`]: string | undefined;
@@ -26,6 +30,8 @@ const {
   class: className = '',
   eager = false,
   sizes = '100vw',
+  widths = [480, 800, 1200],
+  position,
   inner = '',
   style,
   ...data
@@ -38,11 +44,12 @@ const {
       src={src}
       alt={alt}
       formats={['avif', 'webp']}
-      widths={[480, 800, 1200, 1800]}
+      widths={widths.filter((w) => w <= src.width)}
       sizes={sizes}
       loading={eager ? 'eager' : 'lazy'}
       fetchpriority={eager ? 'high' : 'auto'}
       class={inner}
+      style={position ? `object-position:${position}` : undefined}
     />
   ) : (
     <div
