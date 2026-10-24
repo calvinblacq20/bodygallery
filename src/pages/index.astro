@@ -69,20 +69,24 @@ const values = [
 >
   <!-- Hero -->
   <section class="hero relative flex min-h-[calc(100svh_-_var(--action-bar-space,0px))] flex-col overflow-hidden text-white">
-    <!-- A landscape photo: on tall phone screens it fills the height, so it renders about
-         1.5x the screen height wide. sizes says so, or phones would fetch a blurry version. -->
+    <!-- A landscape photo: on tall screens it fills the height (drawn 18% taller in portrait,
+         see the style below), so it renders well over the screen's width. sizes says so, or
+         phones would fetch a blurry version. -->
     <Photo
       src={heroPhoto}
-      alt="Portrait of a woman with glowing skin against a dark backdrop"
+      alt="Woman in a bathrobe and head towel applying a face mask by a window"
       widths={[800, 1200, 1800, 2400, 3200]}
-      sizes="(max-aspect-ratio: 3/2) 150vh, 100vw"
-      tone="deep"
-      note="Hero: centred portrait, dark backdrop, glowing skin"
+      sizes="(max-aspect-ratio: 4/5) 180vh, (max-aspect-ratio: 3/2) 150vh, 100vw"
+      tone="warm"
+      note="Hero: client mid-treatment, robe and towel, soft window light"
       class="hero-photo absolute inset-0"
       eager
       data-note-pos="mid"
     />
-    <div class="absolute inset-0 bg-gradient-to-b from-black/30 via-black/10 to-black/35"></div>
+    <!-- A bright photo under white type: darker at the top for the logo and menu, lightest
+         across her face, then deepening from just below it so the headline reads on the
+         white robe (about 5:1) and the big word sits on the darkest band. -->
+    <div class="hero-shade absolute inset-0"></div>
     <div class="hero-copy wrap relative mt-auto pt-32 pb-[2.5vw] md:pb-24">
       <div class="mb-6 max-w-[34rem] md:mb-8" data-reveal>
         <h1 class="t-body-lg">
@@ -448,15 +452,35 @@ const values = [
 </Base>
 
 <style>
-  /* Hero framing. Her face sits in the upper third, clear of the words below it. On short,
-     wide screens (a phone turned sideways, a desktop zoomed right in) the photo frames a
-     little higher so the headline lands under her chin rather than across her face. */
+  /* Hero framing. Her face sits left of centre and a little above the middle of the photo.
+     On short, wide screens (a phone turned sideways, a desktop zoomed right in) the photo
+     frames higher so the headline lands under her face rather than across it. */
   .hero :global(.hero-photo img) {
-    object-position: 50% 30%;
+    object-position: 20% 35%;
+  }
+  .hero-shade {
+    background: linear-gradient(
+      to bottom,
+      rgb(0 0 0 / 0.45),
+      rgb(0 0 0 / 0.05) 32%,
+      rgb(0 0 0 / 0.45) 58%,
+      rgb(0 0 0 / 0.78)
+    );
+  }
+  .hero-copy {
+    text-shadow: 0 1px 18px rgb(0 0 0 / 0.3);
+  }
+  /* Portrait screens show a narrow slice of this landscape photo: draw it a little taller,
+     starting above the hero, so her face rises into the upper third (the towel's top is
+     trimmed) and the frame follows her face rather than the empty window. */
+  @media (max-aspect-ratio: 4/5) {
+    .hero :global(.hero-photo) {
+      top: -18%;
+    }
   }
   @media (max-height: 560px) and (min-aspect-ratio: 1/1) {
     .hero :global(.hero-photo img) {
-      object-position: 50% 72%;
+      object-position: 20% 80%;
     }
     /* Fit the whole hero on one short screen: less room under the header, and the big word
        capped by the screen's height as well as its width. */
