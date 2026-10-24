@@ -43,7 +43,7 @@ let index = 0;
     letter-spacing: -0.04em;
     text-transform: uppercase;
     white-space: nowrap;
-    /* Phones: one word per line, sized so the longer word spans the width. */
+    /* Portrait phones: one word per line, sized so the longer word spans the width. */
     font-size: calc(var(--content) / 4.35);
   }
   .giant-line {
@@ -59,7 +59,9 @@ let index = 0;
     padding-bottom: 0.04em;
     margin-bottom: -0.04em;
   }
-  @media (min-width: 768px) {
+  /* One line from tablet width up, and on any screen wider than it is tall (a phone turned
+     sideways, or a desktop zoomed to 200%), where two lines would swamp the height. */
+  @media (min-width: 768px), (min-aspect-ratio: 1/1) {
     .giant-word {
       flex-wrap: nowrap;
       font-size: calc(var(--content) / 7.2);

@@ -69,19 +69,21 @@ const values = [
 >
   <!-- Hero -->
   <section class="hero relative flex min-h-[calc(100svh_-_var(--action-bar-space,0px))] flex-col overflow-hidden text-white">
+    <!-- A landscape photo: on tall phone screens it fills the height, so it renders about
+         1.5x the screen height wide. sizes says so, or phones would fetch a blurry version. -->
     <Photo
       src={heroPhoto}
-      alt="Close-up of a woman's glowing skin"
-      position="50% 64%"
-      widths={[800, 1400, 2000]}
+      alt="Portrait of a woman with glowing skin against a dark backdrop"
+      widths={[800, 1200, 1800, 2400, 3200]}
+      sizes="(max-aspect-ratio: 3/2) 150vh, 100vw"
       tone="deep"
-      note="Hero: close-up portrait, warm studio light, calm expression"
+      note="Hero: centred portrait, dark backdrop, glowing skin"
       class="hero-photo absolute inset-0"
       eager
       data-note-pos="mid"
     />
     <div class="absolute inset-0 bg-gradient-to-b from-black/30 via-black/10 to-black/35"></div>
-    <div class="hero-copy wrap relative mt-auto pt-32 pb-[2.5vw]">
+    <div class="hero-copy wrap relative mt-auto pt-32 pb-[2.5vw] md:pb-24">
       <div class="mb-6 max-w-[34rem] md:mb-8" data-reveal>
         <h1 class="t-body-lg">
           Spa rituals and body treatments in Kasoa. Unhurried, honest, and priced for real life.
@@ -446,6 +448,25 @@ const values = [
 </Base>
 
 <style>
+  /* Hero framing. Her face sits in the upper third, clear of the words below it. On short,
+     wide screens (a phone turned sideways, a desktop zoomed right in) the photo frames a
+     little higher so the headline lands under her chin rather than across her face. */
+  .hero :global(.hero-photo img) {
+    object-position: 50% 30%;
+  }
+  @media (max-height: 560px) and (min-aspect-ratio: 1/1) {
+    .hero :global(.hero-photo img) {
+      object-position: 50% 72%;
+    }
+    /* Fit the whole hero on one short screen: less room under the header, and the big word
+       capped by the screen's height as well as its width. */
+    .hero-copy {
+      padding-top: 5rem;
+    }
+    .hero-copy :global(.giant-word) {
+      font-size: min(calc(var(--content) / 7.2), 20svh);
+    }
+  }
   .oval {
     border-radius: 50%;
     overflow: hidden;

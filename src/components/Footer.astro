@@ -113,7 +113,8 @@ const year = new Date().getFullYear();
     </div>
   </div>
 
-  <div class="wrap pb-6">
+  <!-- md:pb-24 keeps the word and the small print clear of the Book/Call/WhatsApp pill. -->
+  <div class="wrap pb-6 md:pb-24">
     <GiantWord text={settings.businessName} />
     <p class="mt-6 text-xs text-white/60">
       © {year} {settings.businessName} · {settings.tagline}
